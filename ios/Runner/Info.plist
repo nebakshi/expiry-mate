@@ -53,6 +53,17 @@
 	<string>Bloom uses the camera to scan product barcodes and expiry dates.</string>
 	<key>NSPhotoLibraryUsageDescription</key>
 	<string>Bloom needs photo access so you can pick an image of an expiry date to scan.</string>
+	<key>CFBundleURLTypes</key>
+	<array>
+		<dict>
+			<key>CFBundleTypeRole</key>
+			<string>Editor</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>com.googleusercontent.apps.1008474720622-eg3c0a4ph3v73rgnb2hj15mjehu5dfjk</string>
+			</array>
+		</dict>
+	</array>
 	<key>LSApplicationQueriesSchemes</key>
 	<array>
 		<string>https</string>

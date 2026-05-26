@@ -55,11 +55,12 @@ class DefaultFirebaseOptions {
   );
 
   static const FirebaseOptions ios = FirebaseOptions(
-    apiKey: 'REPLACE_ME',
-    appId: 'REPLACE_ME',
-    messagingSenderId: 'REPLACE_ME',
-    projectId: 'REPLACE_ME',
-    storageBucket: 'REPLACE_ME',
+    apiKey: 'AIzaSyAdtiHWfXKWD2iYGxprfTbbP-6RtZ-txms',
+    appId: '1:1008474720622:ios:4c05e6c0857bb0b4d0197f',
+    messagingSenderId: '1008474720622',
+    projectId: 'expiry-ecosystem',
+    storageBucket: 'expiry-ecosystem.firebasestorage.app',
+    iosClientId: '1008474720622-eg3c0a4ph3v73rgnb2hj15mjehu5dfjk.apps.googleusercontent.com',
     iosBundleId: 'app.expirymate.expiryMate',
   );
 
