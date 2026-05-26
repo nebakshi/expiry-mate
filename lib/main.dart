@@ -31,7 +31,7 @@ Future<void> main() async {
     // Initialise local notifications + timezone DB up front.
     await NotificationService().init();
 
-    runApp(const ProviderScope(child: ExpiryMateApp()));
+    runApp(const ProviderScope(child: BloomApp()));
   }, (error, stack) {
     FirebaseCrashlytics.instance.recordError(error, stack, fatal: true);
   });

@@ -101,18 +101,18 @@ class _SplashScreen extends StatelessWidget {
   const _SplashScreen();
   @override
   Widget build(BuildContext context) {
-    return const Scaffold(
+    return Scaffold(
       body: Center(
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(Icons.eco_rounded, size: 72, color: Color(0xFF1B8A5A)),
-            SizedBox(height: 16),
-            Text('ExpiryMate',
+            Image.asset('assets/images/bloom_logo_1024.png', width: 96, height: 96),
+            const SizedBox(height: 16),
+            const Text('Bloom',
                 style:
                     TextStyle(fontSize: 24, fontWeight: FontWeight.w800)),
-            SizedBox(height: 24),
-            CircularProgressIndicator(),
+            const SizedBox(height: 24),
+            const CircularProgressIndicator(),
           ],
         ),
       ),

@@ -88,7 +88,7 @@ class ProductController extends StateNotifier<AsyncValue<void>> {
   final NotificationService _notifications;
   final Ref _ref;
 
-  Future<bool> save(Product product) async {
+  Future<Product?> save(Product product) async {
     state = const AsyncLoading();
     final user = _ref.read(currentUserProvider);
     final isPremium = user?.isPremium ?? false;
@@ -99,10 +99,10 @@ class ProductController extends StateNotifier<AsyncValue<void>> {
         final ids = await _notifications.scheduleForProduct(value);
         await _repo.updateProduct(value.copyWith(notificationIds: ids));
         state = const AsyncData(null);
-        return true;
+        return value;
       case Err(:final failure):
         state = AsyncError(failure, StackTrace.current);
-        return false;
+        return null;
     }
   }
 

@@ -90,10 +90,13 @@ class _ConfirmProductScreenState extends ConsumerState<ConfirmProductScreen> {
       updatedAt: now,
     );
 
-    final ok = await ref.read(productControllerProvider.notifier).save(product);
+    final saved = await ref.read(productControllerProvider.notifier).save(product);
     if (!mounted) return;
-    if (ok) {
-      showSuccess(context, '${product.productName} saved. Reminders set.');
+    if (saved != null) {
+      final msg = saved.quantity > product.quantity
+          ? '${saved.productName} quantity updated to ${saved.quantity}.'
+          : '${saved.productName} saved. Reminders set.';
+      showSuccess(context, msg);
       context.go('/home');
     } else {
       final err = ref.read(productControllerProvider);

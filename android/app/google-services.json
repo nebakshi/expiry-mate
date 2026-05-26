@@ -43,6 +43,14 @@
       },
       "oauth_client": [
         {
+          "client_id": "1008474720622-8a848k40k129ha1r0fr7vf3mgt9gcfbs.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.expirymate.expiry_mate",
+            "certificate_hash": "f129c3fc110a2c793f1f6106d0de7c7523e84fb5"
+          }
+        },
+        {
           "client_id": "1008474720622-knah8bcs8hcp1gkuf9ss24ppr0mmtffc.apps.googleusercontent.com",
           "client_type": 3
         }

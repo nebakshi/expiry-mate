@@ -5,8 +5,8 @@ import 'core/constants/app_constants.dart';
 import 'core/router/app_router.dart';
 import 'core/theme/app_theme.dart';
 
-class ExpiryMateApp extends ConsumerWidget {
-  const ExpiryMateApp({super.key});
+class BloomApp extends ConsumerWidget {
+  const BloomApp({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {

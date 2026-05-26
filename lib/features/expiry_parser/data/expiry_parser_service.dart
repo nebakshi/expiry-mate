@@ -51,6 +51,12 @@ class ExpiryParserService {
   String _clean(String raw) {
     var s = raw.toUpperCase();
     s = s.replaceAll(RegExp(r'[^A-Z0-9/\-.: ]'), ' ');
+    // Collapse spaces around date separators between digits
+    // (handles OCR noise like "12 . 08 . 26" → "12.08.26").
+    s = s.replaceAllMapped(
+      RegExp(r'(\d)\s*([/\-.])\s*(\d)'),
+      (m) => '${m[1]}${m[2]}${m[3]}',
+    );
     s = s.replaceAll(RegExp(r'\s+'), ' ').trim();
     return s;
   }
@@ -58,7 +64,7 @@ class ExpiryParserService {
   // ---- Step 4: explicit expiry (highest confidence) ----
   Iterable<ExpiryDateCandidate> _explicitExpiry(String s) sync* {
     final keyword = RegExp(
-      r'(?:EXP(?:IRY)?|EXPIRES?|EXP\s*DATE)[:.\s]*([0-9A-Z/\-. ]{4,20})',
+      r'\b(?:EXP(?:IRY)?|EXPIRES?|EXP\s*DATE|EX(?=[:.\s]))[:.\s]*([0-9A-Z/\-. ]{4,20})',
     );
     for (final m in keyword.allMatches(s)) {
       final d = _tryAnyDate(m.group(1)!);
@@ -185,8 +191,8 @@ class ExpiryParserService {
       final d = _tryNumericDate(c);
       if (d != null) return d;
     }
-    // 24 AUG 2026
-    final tm = RegExp(r'(\d{1,2})\s*([A-Z]{3,4})\s*(\d{2,4})').firstMatch(c);
+    // 24 AUG 2026 or 24.AUG.26 or 24-AUG-26
+    final tm = RegExp(r'(\d{1,2})[/\-. ]*([A-Z]{3,4})[/\-. ]*(\d{2,4})').firstMatch(c);
     if (tm != null) {
       final d = _buildDate(
         int.parse(tm.group(1)!),
@@ -195,18 +201,18 @@ class ExpiryParserService {
       );
       if (d != null) return d;
     }
-    // AUG 2026 / DEC 2026 → last day of that month
-    final mm = RegExp(r'\b([A-Z]{3,4})\s*(\d{4})\b').firstMatch(c);
+    // AUG 2026 / DEC 26 / AUG.26 → last day of that month
+    final mm = RegExp(r'\b([A-Z]{3,4})[/\-. ]*(\d{2,4})\b').firstMatch(c);
     if (mm != null && _months.containsKey(mm.group(1))) {
       final month = _months[mm.group(1)]!;
-      final year = int.parse(mm.group(2)!);
+      final year = _yyyy(mm.group(2)!);
       return DateTime(year, month + 1, 0); // day 0 of next month = last day
     }
-    // MM/YYYY → last day of month
-    final my = RegExp(r'\b(\d{1,2})[/\-.](\d{4})\b').firstMatch(c);
+    // MM/YYYY or MM/YY → last day of month
+    final my = RegExp(r'\b(\d{1,2})[/\-.](\d{2,4})\b').firstMatch(c);
     if (my != null) {
       final month = int.parse(my.group(1)!);
-      final year = int.parse(my.group(2)!);
+      final year = _yyyy(my.group(2)!);
       if (month >= 1 && month <= 12) return DateTime(year, month + 1, 0);
     }
     // numeric DD/MM/YYYY

@@ -58,5 +58,42 @@ void main() {
       final d = best('Packed 01/01/2026 EXP 31/12/2026');
       expect(d, DateTime(2026, 12, 31));
     });
+
+    test('dot separator: DD.MM.YYYY', () {
+      expect(best('EXP 12.08.2026'), DateTime(2026, 8, 12));
+    });
+
+    test('dot separator with 2-digit year: DD.MM.YY', () {
+      expect(best('EXP 12.08.26'), DateTime(2026, 8, 12));
+    });
+
+    test('dash separator with 2-digit year: DD-MM-YY', () {
+      expect(best('EXP 15-06-27'), DateTime(2027, 6, 15));
+    });
+
+    test('mixed separators from OCR noise: spaces around dots', () {
+      expect(best('EXP 12 . 08 . 26'), DateTime(2026, 8, 12));
+    });
+
+    test('MON YY (2-digit year, text month)', () {
+      expect(best('BB:DEC 26'), DateTime(2026, 12, 31));
+    });
+
+    test('MM/YY → last day of month', () {
+      expect(best('EXP 08/26'), DateTime(2026, 8, 31));
+    });
+
+    test('DD.MON.YY format', () {
+      expect(best('EXP 24.AUG.26'), DateTime(2026, 8, 24));
+    });
+
+    test('EX: shorthand with separator', () {
+      expect(best('EX:12/08/2026'), DateTime(2026, 8, 12));
+    });
+
+    test('EX does not false-match EXTRA or similar', () {
+      // "EXTRA VIRGIN OLIVE OIL" should not yield an expiry date from "EXTRA".
+      expect(best('EXTRA VIRGIN OLIVE OIL'), isNull);
+    });
   });
 }

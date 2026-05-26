@@ -7,7 +7,7 @@
 	<key>CFBundleDevelopmentRegion</key>
 	<string>$(DEVELOPMENT_LANGUAGE)</string>
 	<key>CFBundleDisplayName</key>
-	<string>Expiry Mate</string>
+	<string>Bloom</string>
 	<key>CFBundleExecutable</key>
 	<string>$(EXECUTABLE_NAME)</string>
 	<key>CFBundleIdentifier</key>
@@ -50,9 +50,9 @@
 	<key>UIApplicationSupportsIndirectInputEvents</key>
 	<true/>
 	<key>NSCameraUsageDescription</key>
-	<string>ExpiryMate uses the camera to scan product barcodes and expiry dates.</string>
+	<string>Bloom uses the camera to scan product barcodes and expiry dates.</string>
 	<key>NSPhotoLibraryUsageDescription</key>
-	<string>ExpiryMate needs photo access so you can pick an image of an expiry date to scan.</string>
+	<string>Bloom needs photo access so you can pick an image of an expiry date to scan.</string>
 	<key>LSApplicationQueriesSchemes</key>
 	<array>
 		<string>https</string>

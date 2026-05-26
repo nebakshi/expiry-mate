@@ -4,8 +4,8 @@ import 'package:flutter/material.dart';
 class AppConstants {
   AppConstants._();
 
-  static const String appName = 'ExpiryMate';
-  static const String tagline = 'The fastest expiry reminder for Indian kitchens.';
+  static const String appName = 'Bloom';
+  static const String tagline = 'Keep it fresh. Always.';
 
   // Free-plan limit (see PLAN §21 Monetization).
   static const int freePlanProductLimit = 30;
@@ -22,7 +22,7 @@ class AppConstants {
 
   // Open Food Facts (PLAN §16). No API key needed.
   static const String offBaseUrl = 'https://world.openfoodfacts.org/api/v2/product';
-  static const String offUserAgent = 'ExpiryMate/1.0 (contact@expirymate.app)';
+  static const String offUserAgent = 'Bloom/1.0 (contact@bloomapp.io)';
 
   // Firestore collection paths (PLAN §8).
   static const String usersCollection = 'users';

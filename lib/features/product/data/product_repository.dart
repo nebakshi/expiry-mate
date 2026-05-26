@@ -42,6 +42,17 @@ class ProductRepository {
           ));
         }
       }
+
+      final duplicate = await findDuplicate(product);
+      if (duplicate != null) {
+        final merged = duplicate.copyWith(
+          quantity: duplicate.quantity + product.quantity,
+          updatedAt: DateTime.now(),
+        );
+        await _col(product.userId).doc(duplicate.id).set(merged.toFirestore());
+        return Success(merged);
+      }
+
       final id = product.id.isEmpty ? _uuid.v4() : product.id;
       final now = DateTime.now();
       final toSave = product.copyWith(updatedAt: now).copyWithId(id, now);
@@ -52,6 +63,37 @@ class ProductRepository {
     } catch (_) {
       return const Err(UnknownFailure('Could not save product.'));
     }
+  }
+
+  /// Finds an existing non-consumed product with the same expiry date and
+  /// identity (barcode match, or name+brand match if no barcode).
+  Future<Product?> findDuplicate(Product product) async {
+    final expiryStr = product.expiryDate.toIso8601String().substring(0, 10);
+    final col = _col(product.userId);
+
+    Query<Map<String, dynamic>> baseQuery = col
+        .where('isConsumed', isEqualTo: false)
+        .where('expiryDate', isEqualTo: expiryStr);
+
+    if (product.barcode != null && product.barcode!.isNotEmpty) {
+      final snap = await baseQuery
+          .where('barcode', isEqualTo: product.barcode)
+          .limit(1)
+          .get();
+      if (snap.docs.isNotEmpty) {
+        return Product.fromFirestore(snap.docs.first.data(), snap.docs.first.id);
+      }
+    }
+
+    final snap = await baseQuery
+        .where('productName', isEqualTo: product.productName)
+        .limit(1)
+        .get();
+    if (snap.docs.isNotEmpty) {
+      return Product.fromFirestore(snap.docs.first.data(), snap.docs.first.id);
+    }
+
+    return null;
   }
 
   Future<Result<void>> updateProduct(Product product) async {

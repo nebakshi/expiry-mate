@@ -46,8 +46,8 @@ class DefaultRemindersController extends StateNotifier<List<int>> {
 class SettingsScreen extends ConsumerWidget {
   const SettingsScreen({super.key});
 
-  static const _privacyUrl = 'https://expirymate.app/privacy';
-  static const _termsUrl = 'https://expirymate.app/terms';
+  static const _privacyUrl = 'https://bloomapp.io/privacy';
+  static const _termsUrl = 'https://bloomapp.io/terms';
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -75,7 +75,7 @@ class SettingsScreen extends ConsumerWidget {
           ListTile(
             leading: const Icon(Icons.notifications_active_outlined),
             title: const Text('Notification permission'),
-            subtitle: const Text('Allow ExpiryMate to send expiry alerts'),
+            subtitle: const Text('Allow Bloom to send expiry alerts'),
             trailing: const Icon(Icons.chevron_right),
             onTap: () => _requestNotifications(context, ref),
           ),
