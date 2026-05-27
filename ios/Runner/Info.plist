@@ -64,6 +64,8 @@
 			</array>
 		</dict>
 	</array>
+	<key>GIDClientID</key>
+	<string>1008474720622-eg3c0a4ph3v73rgnb2hj15mjehu5dfjk.apps.googleusercontent.com</string>
 	<key>LSApplicationQueriesSchemes</key>
 	<array>
 		<string>https</string>
