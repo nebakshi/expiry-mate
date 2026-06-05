@@ -206,10 +206,13 @@ class _ScannerOverlay extends StatelessWidget {
   const _ScannerOverlay();
   @override
   Widget build(BuildContext context) {
+    final size = MediaQuery.sizeOf(context);
+    final overlayWidth = size.width * 0.72;
+    final overlayHeight = overlayWidth * 0.64;
     return Center(
       child: Container(
-        width: 280,
-        height: 180,
+        width: overlayWidth,
+        height: overlayHeight,
         decoration: BoxDecoration(
           border: Border.all(color: AppColors.accent, width: 3),
           borderRadius: BorderRadius.circular(20),

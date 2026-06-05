@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import '../../../../core/constants/app_constants.dart';
 import '../../../../core/errors/failures.dart';
 import '../../../../core/extensions/date_extensions.dart';
+import '../../../../core/theme/responsive.dart';
 import '../../../../shared/models/product_draft.dart';
 import '../../../../shared/widgets/common_widgets.dart';
 import '../../../auth/presentation/providers/auth_providers.dart';
@@ -145,8 +146,10 @@ class _ConfirmProductScreenState extends ConsumerState<ConfirmProductScreen> {
                       children: [
                         _label('Category'),
                         DropdownButtonFormField<ProductCategory>(
-                          initialValue: _category,
+                          value: _category,
                           isExpanded: true,
+                          isDense: Responsive.isSmallDevice,
+                          style: TextStyle(fontSize: Responsive.fontSize(14), color: Theme.of(context).colorScheme.onSurface),
                           items: ProductCategory.values
                               .map((c) => DropdownMenuItem(
                                     value: c,
@@ -159,15 +162,17 @@ class _ConfirmProductScreenState extends ConsumerState<ConfirmProductScreen> {
                       ],
                     ),
                   ),
-                  const SizedBox(width: AppSpacing.md),
+                  SizedBox(width: Responsive.isSmallDevice ? AppSpacing.sm : AppSpacing.md),
                   Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         _label('Storage'),
                         DropdownButtonFormField<StorageLocation>(
-                          initialValue: _storage,
+                          value: _storage,
                           isExpanded: true,
+                          isDense: Responsive.isSmallDevice,
+                          style: TextStyle(fontSize: Responsive.fontSize(14), color: Theme.of(context).colorScheme.onSurface),
                           items: StorageLocation.values
                               .map((s) => DropdownMenuItem(
                                     value: s,

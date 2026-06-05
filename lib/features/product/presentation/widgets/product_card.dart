@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../../../core/constants/app_constants.dart';
 import '../../../../core/extensions/date_extensions.dart';
+import '../../../../core/theme/responsive.dart';
 import '../../domain/entities/product.dart';
 import '../../domain/entities/product_enums.dart';
 import '../../../../shared/widgets/common_widgets.dart';
@@ -14,16 +15,20 @@ class ProductCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isSmall = Responsive.isSmallDevice;
+    final thumbSize = isSmall ? 42.0 : 52.0;
+    final cardPad = isSmall ? 10.0 : AppSpacing.md;
+
     return Card(
       child: InkWell(
         borderRadius: BorderRadius.circular(AppSpacing.radius),
         onTap: onTap,
         child: Padding(
-          padding: const EdgeInsets.all(AppSpacing.md),
+          padding: EdgeInsets.all(cardPad),
           child: Row(
             children: [
-              _Thumb(product: product),
-              const SizedBox(width: AppSpacing.md),
+              _Thumb(product: product, size: thumbSize),
+              SizedBox(width: isSmall ? 10.0 : AppSpacing.md),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -32,8 +37,9 @@ class ProductCard extends StatelessWidget {
                       product.productName,
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
-                      style: const TextStyle(
-                          fontSize: 16, fontWeight: FontWeight.w700),
+                      style: TextStyle(
+                          fontSize: Responsive.fontSize(15),
+                          fontWeight: FontWeight.w700),
                     ),
                     if (product.brand != null &&
                         product.brand!.isNotEmpty) ...[
@@ -41,44 +47,48 @@ class ProductCard extends StatelessWidget {
                       Text(product.brand!,
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
-                          style: const TextStyle(
-                              color: AppColors.textSecondary, fontSize: 13)),
+                          style: TextStyle(
+                              color: Theme.of(context).colorScheme.onSurfaceVariant,
+                              fontSize: Responsive.fontSize(12))),
                     ],
-                    const SizedBox(height: AppSpacing.sm),
+                    SizedBox(height: isSmall ? 4 : AppSpacing.sm),
                     Row(
                       children: [
                         StatusBadge(product.status),
-                        const SizedBox(width: AppSpacing.sm),
-                        Icon(product.category.icon,
-                            size: 14, color: AppColors.textSecondary),
-                        const SizedBox(width: 4),
-                        Flexible(
-                          child: Text(product.category.label,
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                              style: const TextStyle(
-                                  color: AppColors.textSecondary,
-                                  fontSize: 12)),
-                        ),
+                        if (!isSmall) ...[
+                          const SizedBox(width: AppSpacing.sm),
+                          Icon(product.category.icon,
+                              size: 14, color: Theme.of(context).colorScheme.onSurfaceVariant),
+                          const SizedBox(width: 4),
+                          Flexible(
+                            child: Text(product.category.label,
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                                style: TextStyle(
+                                    color: Theme.of(context).colorScheme.onSurfaceVariant,
+                                    fontSize: 12)),
+                          ),
+                        ],
                       ],
                     ),
                   ],
                 ),
               ),
-              const SizedBox(width: AppSpacing.sm),
+              SizedBox(width: isSmall ? 4 : AppSpacing.sm),
               Column(
                 crossAxisAlignment: CrossAxisAlignment.end,
                 children: [
                   Text(
                     product.expiryDate.displayDate,
-                    style: const TextStyle(
-                        fontSize: 12, color: AppColors.textSecondary),
+                    style: TextStyle(
+                        fontSize: Responsive.fontSize(11),
+                        color: Theme.of(context).colorScheme.onSurfaceVariant),
                   ),
                   const SizedBox(height: 4),
                   Text(
                     product.expiryDate.daysLeftLabel,
                     style: TextStyle(
-                      fontSize: 13,
+                      fontSize: Responsive.fontSize(12),
                       fontWeight: FontWeight.w700,
                       color: product.status.color,
                     ),
@@ -94,8 +104,9 @@ class ProductCard extends StatelessWidget {
 }
 
 class _Thumb extends StatelessWidget {
-  const _Thumb({required this.product});
+  const _Thumb({required this.product, this.size = 52});
   final Product product;
+  final double size;
 
   @override
   Widget build(BuildContext context) {
@@ -103,8 +114,8 @@ class _Thumb extends StatelessWidget {
     return ClipRRect(
       borderRadius: BorderRadius.circular(12),
       child: SizedBox(
-        width: 52,
-        height: 52,
+        width: size,
+        height: size,
         child: (url != null && url.isNotEmpty)
             ? Image.network(
                 url,
@@ -121,7 +132,7 @@ class _Thumb extends StatelessWidget {
   Widget _fallback() => Container(
         color: product.category.color(),
         child: Icon(product.category.icon,
-            color: AppColors.primary, size: 26),
+            color: AppColors.primary, size: size * 0.5),
       );
 }
 

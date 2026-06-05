@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../../core/constants/app_constants.dart';
 import '../../../core/router/app_router.dart';
+import '../../../core/theme/responsive.dart';
 
 class _Page {
   const _Page(this.icon, this.title, this.body);
@@ -66,31 +67,34 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                 onPageChanged: (i) => setState(() => _index = i),
                 itemBuilder: (_, i) {
                   final p = _pages[i];
+                  final iconSize = Responsive.isSmallDevice ? 48.0 : 72.0;
+                  final iconPad = Responsive.isSmallDevice ? 18.0 : 28.0;
                   return Padding(
-                    padding: const EdgeInsets.all(AppSpacing.xl),
+                    padding: EdgeInsets.all(Responsive.isSmallDevice ? AppSpacing.md : AppSpacing.xl),
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         Container(
-                          padding: const EdgeInsets.all(28),
+                          padding: EdgeInsets.all(iconPad),
                           decoration: BoxDecoration(
                             color: AppColors.primary.withValues(alpha: 0.10),
                             shape: BoxShape.circle,
                           ),
                           child: Icon(p.icon,
-                              size: 72, color: AppColors.primary),
+                              size: iconSize, color: AppColors.primary),
                         ),
-                        const SizedBox(height: AppSpacing.xl),
+                        SizedBox(height: Responsive.isSmallDevice ? AppSpacing.md : AppSpacing.xl),
                         Text(p.title,
                             textAlign: TextAlign.center,
-                            style: const TextStyle(
-                                fontSize: 24, fontWeight: FontWeight.w800)),
+                            style: TextStyle(
+                                fontSize: Responsive.fontSize(22),
+                                fontWeight: FontWeight.w800)),
                         const SizedBox(height: AppSpacing.md),
                         Text(p.body,
                             textAlign: TextAlign.center,
-                            style: const TextStyle(
-                                fontSize: 16,
-                                color: AppColors.textSecondary,
+                            style: TextStyle(
+                                fontSize: Responsive.fontSize(15),
+                                color: Theme.of(context).colorScheme.onSurfaceVariant,
                                 height: 1.4)),
                       ],
                     ),

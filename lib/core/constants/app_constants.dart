@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../theme/app_colors.dart';
 
 /// Centralised, immutable app constants. Keep magic numbers/strings here.
 class AppConstants {
@@ -32,27 +33,29 @@ class AppConstants {
   static const String appConfigCollection = 'app_config';
 }
 
-/// Brand palette.
+/// Brand palette — delegates to light-mode tokens for compile-time compat.
+/// Prefer `AppColorsData.of(context)` in widgets for dark-mode support.
 class AppColors {
   AppColors._();
 
-  static const Color primary = Color(0xFF1B8A5A); // fresh green
-  static const Color primaryDark = Color(0xFF14633F);
-  static const Color accent = Color(0xFFFFB300);
+  static const Color primary = AppLightColors.primary;
+  static const Color primaryDark = AppLightColors.primaryDark;
+  static const Color accent = AppLightColors.accent;
 
-  static const Color fresh = Color(0xFF2E9E5B);
-  static const Color expiringSoon = Color(0xFFF59E0B);
-  static const Color expired = Color(0xFFE03E36);
-  static const Color consumed = Color(0xFF8A8F98);
+  static const Color fresh = AppLightColors.fresh;
+  static const Color expiringSoon = AppLightColors.expiringSoon;
+  static const Color expired = AppLightColors.expired;
+  static const Color consumed = AppLightColors.consumed;
 
-  static const Color surface = Color(0xFFF7F9F8);
-  static const Color card = Colors.white;
-  static const Color textPrimary = Color(0xFF1A1D1B);
-  static const Color textSecondary = Color(0xFF5E6562);
-  static const Color border = Color(0xFFE3E8E5);
+  static const Color surface = AppLightColors.surface;
+  static const Color card = AppLightColors.card;
+  static const Color textPrimary = AppLightColors.textPrimary;
+  static const Color textSecondary = AppLightColors.textSecondary;
+  static const Color border = AppLightColors.border;
 }
 
-/// Spacing scale.
+/// Spacing scale — fixed values for backward compatibility.
+/// For responsive scaling, use `AppSpacing` from `core/theme/app_spacing.dart`.
 class AppSpacing {
   AppSpacing._();
   static const double xs = 4;

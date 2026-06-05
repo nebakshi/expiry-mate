@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/constants/app_constants.dart';
 import '../../../../core/errors/failures.dart';
+import '../../../../core/theme/responsive.dart';
 import '../../../../shared/widgets/common_widgets.dart';
 import '../providers/auth_providers.dart';
 
@@ -24,60 +25,76 @@ class LoginScreen extends ConsumerWidget {
       }
     });
 
+    final iconSize = Responsive.isSmallDevice ? 48.0 : 64.0;
+    final iconPad = Responsive.isSmallDevice ? 16.0 : 24.0;
+
     return Scaffold(
       body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.all(AppSpacing.lg),
-          child: Column(
-            children: [
-              const Spacer(),
-              Container(
-                padding: const EdgeInsets.all(24),
-                decoration: BoxDecoration(
-                  color: AppColors.primary.withValues(alpha: 0.10),
-                  shape: BoxShape.circle,
+        child: SingleChildScrollView(
+          padding: EdgeInsets.all(Responsive.isSmallDevice ? AppSpacing.md : AppSpacing.lg),
+          child: ConstrainedBox(
+            constraints: BoxConstraints(
+              minHeight: MediaQuery.sizeOf(context).height -
+                  MediaQuery.paddingOf(context).vertical -
+                  (Responsive.isSmallDevice ? AppSpacing.md * 2 : AppSpacing.lg * 2),
+            ),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                SizedBox(height: Responsive.hp(8)),
+                Container(
+                  padding: EdgeInsets.all(iconPad),
+                  decoration: BoxDecoration(
+                    color: AppColors.primary.withValues(alpha: 0.10),
+                    shape: BoxShape.circle,
+                  ),
+                  child: Icon(Icons.eco_rounded,
+                      size: iconSize, color: AppColors.primary),
                 ),
-                child: const Icon(Icons.eco_rounded,
-                    size: 64, color: AppColors.primary),
-              ),
-              const SizedBox(height: AppSpacing.lg),
-              const Text(AppConstants.appName,
-                  style:
-                      TextStyle(fontSize: 28, fontWeight: FontWeight.w800)),
-              const SizedBox(height: AppSpacing.sm),
-              const Text(
-                AppConstants.tagline,
-                textAlign: TextAlign.center,
-                style: TextStyle(color: AppColors.textSecondary, fontSize: 15),
-              ),
-              const Spacer(),
-              _AuthButton(
-                icon: Icons.g_mobiledata_rounded,
-                label: 'Continue with Google',
-                onPressed: loading ? null : controller.signInWithGoogle,
-              ),
-              if (Platform.isIOS || Platform.isMacOS) ...[
-                const SizedBox(height: AppSpacing.md),
+                SizedBox(height: Responsive.isSmallDevice ? AppSpacing.md : AppSpacing.lg),
+                Text(AppConstants.appName,
+                    style: TextStyle(
+                        fontSize: Responsive.fontSize(28),
+                        fontWeight: FontWeight.w800)),
+                const SizedBox(height: AppSpacing.sm),
+                Text(
+                  AppConstants.tagline,
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                      color: Theme.of(context).colorScheme.onSurfaceVariant,
+                      fontSize: Responsive.fontSize(15)),
+                ),
+                SizedBox(height: Responsive.hp(10)),
                 _AuthButton(
-                  icon: Icons.apple,
-                  label: 'Continue with Apple',
-                  onPressed: loading ? null : controller.signInWithApple,
+                  icon: Icons.g_mobiledata_rounded,
+                  label: 'Continue with Google',
+                  onPressed: loading ? null : controller.signInWithGoogle,
+                ),
+                if (Platform.isIOS || Platform.isMacOS) ...[
+                  const SizedBox(height: AppSpacing.md),
+                  _AuthButton(
+                    icon: Icons.apple,
+                    label: 'Continue with Apple',
+                    onPressed: loading ? null : controller.signInWithApple,
+                  ),
+                ],
+                const SizedBox(height: AppSpacing.md),
+                OutlinedButton(
+                  onPressed: loading ? null : controller.signInAsGuest,
+                  child: const Text('Continue as Guest'),
+                ),
+                SizedBox(height: Responsive.isSmallDevice ? AppSpacing.md : AppSpacing.lg),
+                if (loading) const CircularProgressIndicator(),
+                const SizedBox(height: AppSpacing.sm),
+                Text(
+                  'By continuing you agree to our Terms and Privacy Policy.',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                      fontSize: Responsive.fontSize(12),
+                      color: Theme.of(context).colorScheme.onSurfaceVariant),
                 ),
               ],
-              const SizedBox(height: AppSpacing.md),
-              OutlinedButton(
-                onPressed: loading ? null : controller.signInAsGuest,
-                child: const Text('Continue as Guest'),
-              ),
-              const SizedBox(height: AppSpacing.lg),
-              if (loading) const CircularProgressIndicator(),
-              const SizedBox(height: AppSpacing.sm),
-              const Text(
-                'By continuing you agree to our Terms and Privacy Policy.',
-                textAlign: TextAlign.center,
-                style: TextStyle(fontSize: 12, color: AppColors.textSecondary),
-              ),
-            ],
+            ),
           ),
         ),
       ),

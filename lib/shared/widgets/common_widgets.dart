@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../core/constants/app_constants.dart';
+import '../../core/theme/responsive.dart';
 import '../../features/product/domain/entities/product_enums.dart';
 
 class StatusBadge extends StatelessWidget {
@@ -55,32 +56,38 @@ class EmptyState extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final iconSize = Responsive.isSmallDevice ? 36.0 : 48.0;
+    final iconPad = Responsive.isSmallDevice ? 14.0 : 20.0;
+
     return Center(
-      child: Padding(
-        padding: const EdgeInsets.all(AppSpacing.xl),
+      child: SingleChildScrollView(
+        padding: EdgeInsets.all(Responsive.isSmallDevice ? AppSpacing.md : AppSpacing.xl),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
             Container(
-              padding: const EdgeInsets.all(20),
+              padding: EdgeInsets.all(iconPad),
               decoration: BoxDecoration(
                 color: AppColors.primary.withValues(alpha: 0.08),
                 shape: BoxShape.circle,
               ),
-              child: Icon(icon, size: 48, color: AppColors.primary),
+              child: Icon(icon, size: iconSize, color: AppColors.primary),
             ),
-            const SizedBox(height: AppSpacing.lg),
+            SizedBox(height: Responsive.isSmallDevice ? AppSpacing.md : AppSpacing.lg),
             Text(title,
-                style: const TextStyle(
-                    fontSize: 18, fontWeight: FontWeight.w700)),
+                style: TextStyle(
+                    fontSize: Responsive.fontSize(18),
+                    fontWeight: FontWeight.w700)),
             const SizedBox(height: AppSpacing.sm),
             Text(
               message,
               textAlign: TextAlign.center,
-              style: const TextStyle(color: AppColors.textSecondary),
+              style: TextStyle(
+                  color: Theme.of(context).colorScheme.onSurfaceVariant,
+                  fontSize: Responsive.fontSize(14)),
             ),
             if (action != null) ...[
-              const SizedBox(height: AppSpacing.lg),
+              SizedBox(height: Responsive.isSmallDevice ? AppSpacing.md : AppSpacing.lg),
               action!,
             ],
           ],

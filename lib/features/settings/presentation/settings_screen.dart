@@ -8,6 +8,7 @@ import 'package:url_launcher/url_launcher.dart';
 
 import '../../../core/constants/app_constants.dart';
 import '../../../core/extensions/date_extensions.dart';
+import '../../../core/theme/theme_provider.dart';
 import '../../../shared/widgets/common_widgets.dart';
 import '../../auth/presentation/providers/auth_providers.dart';
 import '../../product/presentation/providers/product_providers.dart';
@@ -66,6 +67,8 @@ class SettingsScreen extends ConsumerWidget {
             isPremium: user?.isPremium ?? false,
           ),
           _planBanner(context, user?.isPremium ?? false, summary.total),
+          const _SectionHeader('Appearance'),
+          _ThemeSelector(ref: ref),
           const _SectionHeader('Reminders'),
           _ReminderDaysTile(
             selected: reminders,
@@ -148,7 +151,7 @@ class SettingsScreen extends ConsumerWidget {
                 Text(
                   '$total of ${AppConstants.freePlanProductLimit} items used'
                   '${remaining > 0 ? ' · $remaining left' : ' · limit reached'}',
-                  style: const TextStyle(color: AppColors.textSecondary),
+                  style: TextStyle(color: Theme.of(context).colorScheme.onSurfaceVariant),
                 ),
               ],
             ),
@@ -284,12 +287,12 @@ class _AccountTile extends StatelessWidget {
                         fontSize: 18, fontWeight: FontWeight.w700)),
                 if (email != null && email!.isNotEmpty)
                   Text(email!,
-                      style: const TextStyle(color: AppColors.textSecondary)),
+                      style: TextStyle(color: Theme.of(context).colorScheme.onSurfaceVariant)),
                 const SizedBox(height: 2),
                 Text(
                   _providerLabel(provider),
-                  style: const TextStyle(
-                      color: AppColors.textSecondary, fontSize: 12),
+                  style: TextStyle(
+                      color: Theme.of(context).colorScheme.onSurfaceVariant, fontSize: 12),
                 ),
               ],
             ),
@@ -340,9 +343,9 @@ class _ReminderDaysTile extends StatelessWidget {
           const Text('Default reminders',
               style: TextStyle(fontWeight: FontWeight.w600)),
           const SizedBox(height: 2),
-          const Text(
+          Text(
             'Applied to new products you add',
-            style: TextStyle(color: AppColors.textSecondary, fontSize: 13),
+            style: TextStyle(color: Theme.of(context).colorScheme.onSurfaceVariant, fontSize: 13),
           ),
           const SizedBox(height: AppSpacing.sm),
           Wrap(
@@ -372,6 +375,57 @@ class _ReminderDaysTile extends StatelessWidget {
   }
 }
 
+class _ThemeSelector extends StatelessWidget {
+  const _ThemeSelector({required this.ref});
+  final WidgetRef ref;
+
+  @override
+  Widget build(BuildContext context) {
+    final pref = ref.watch(themePreferenceProvider);
+
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(
+          AppSpacing.lg, AppSpacing.sm, AppSpacing.lg, AppSpacing.sm),
+      child: Row(
+        children: [
+          const Icon(Icons.palette_outlined),
+          const SizedBox(width: AppSpacing.md),
+          const Expanded(
+            child: Text('Theme', style: TextStyle(fontWeight: FontWeight.w600)),
+          ),
+          SegmentedButton<ThemePreference>(
+            segments: const [
+              ButtonSegment(
+                value: ThemePreference.system,
+                icon: Icon(Icons.settings_brightness, size: 18),
+              ),
+              ButtonSegment(
+                value: ThemePreference.light,
+                icon: Icon(Icons.light_mode, size: 18),
+              ),
+              ButtonSegment(
+                value: ThemePreference.dark,
+                icon: Icon(Icons.dark_mode, size: 18),
+              ),
+            ],
+            selected: {pref},
+            onSelectionChanged: (selection) {
+              ref
+                  .read(themePreferenceProvider.notifier)
+                  .setPreference(selection.first);
+            },
+            showSelectedIcon: false,
+            style: const ButtonStyle(
+              visualDensity: VisualDensity.compact,
+              tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
 class _SectionHeader extends StatelessWidget {
   const _SectionHeader(this.title);
   final String title;
@@ -383,11 +437,11 @@ class _SectionHeader extends StatelessWidget {
           AppSpacing.lg, AppSpacing.lg, AppSpacing.lg, AppSpacing.sm),
       child: Text(
         title.toUpperCase(),
-        style: const TextStyle(
+        style: TextStyle(
           fontSize: 12,
           fontWeight: FontWeight.w700,
           letterSpacing: 0.6,
-          color: AppColors.textSecondary,
+          color: Theme.of(context).colorScheme.onSurfaceVariant,
         ),
       ),
     );

@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../../core/constants/app_constants.dart';
+import '../../../../core/theme/responsive.dart';
 import '../../../auth/presentation/providers/auth_providers.dart';
 import '../../../product/domain/entities/product.dart';
 import '../../../../shared/widgets/common_widgets.dart';
@@ -123,9 +124,14 @@ class _StatTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final padValue = Responsive.isSmallDevice ? 10.0 : AppSpacing.md;
+    final statFontSize = Responsive.fontSize(20);
+    final labelFontSize = Responsive.fontSize(11);
+    final iconSize = Responsive.isSmallDevice ? 16.0 : 20.0;
+
     return Expanded(
       child: Container(
-        padding: const EdgeInsets.all(AppSpacing.md),
+        padding: EdgeInsets.all(padValue),
         decoration: BoxDecoration(
           color: color.withValues(alpha: 0.08),
           borderRadius: BorderRadius.circular(AppSpacing.radius),
@@ -133,14 +139,17 @@ class _StatTile extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Icon(icon, color: color, size: 20),
-            const SizedBox(height: AppSpacing.sm),
+            Icon(icon, color: color, size: iconSize),
+            SizedBox(height: Responsive.isSmallDevice ? 4 : AppSpacing.sm),
             Text('$value',
                 style: TextStyle(
-                    fontSize: 22, fontWeight: FontWeight.w800, color: color)),
+                    fontSize: statFontSize,
+                    fontWeight: FontWeight.w800,
+                    color: color)),
             Text(label,
-                style: const TextStyle(
-                    fontSize: 12, color: AppColors.textSecondary)),
+                style: TextStyle(
+                    fontSize: labelFontSize,
+                    color: Theme.of(context).colorScheme.onSurfaceVariant)),
           ],
         ),
       ),
@@ -181,25 +190,35 @@ class _FilterChips extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final chipHeight = Responsive.isSmallDevice ? 40.0 : 48.0;
     return SizedBox(
-      height: 48,
+      height: chipHeight,
       child: ListView(
         scrollDirection: Axis.horizontal,
         padding: const EdgeInsets.symmetric(
             horizontal: AppSpacing.md, vertical: AppSpacing.sm),
         children: InventoryFilter.values.map((f) {
           final isSel = f == selected;
+          final theme = Theme.of(context);
+          final isDark = theme.brightness == Brightness.dark;
           return Padding(
             padding: const EdgeInsets.only(right: AppSpacing.sm),
             child: ChoiceChip(
               label: Text(_labels[f]!),
               selected: isSel,
               onSelected: (_) => onSelected(f),
-              selectedColor: AppColors.primary.withValues(alpha: 0.15),
+              selectedColor: AppColors.primary.withValues(alpha: isDark ? 0.25 : 0.15),
               labelStyle: TextStyle(
-                color: isSel ? AppColors.primaryDark : AppColors.textPrimary,
+                fontSize: Responsive.fontSize(13),
+                color: isSel
+                    ? (isDark ? AppColors.primary : AppColors.primaryDark)
+                    : theme.colorScheme.onSurface,
                 fontWeight: isSel ? FontWeight.w700 : FontWeight.w500,
               ),
+              materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+              visualDensity: Responsive.isSmallDevice
+                  ? VisualDensity.compact
+                  : VisualDensity.standard,
             ),
           );
         }).toList(),

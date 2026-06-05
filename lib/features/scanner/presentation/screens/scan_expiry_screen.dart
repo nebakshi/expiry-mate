@@ -117,9 +117,9 @@ class _ScanExpiryScreenState extends ConsumerState<ScanExpiryScreen> {
                   ),
                 ),
               const SizedBox(height: AppSpacing.md),
-              const Text(
+              Text(
                 'Point your camera at the printed expiry, "best before", or MFG date.',
-                style: TextStyle(color: AppColors.textSecondary),
+                style: TextStyle(color: Theme.of(context).colorScheme.onSurfaceVariant),
               ),
               const SizedBox(height: AppSpacing.md),
               FilledButton.icon(
@@ -149,10 +149,10 @@ class _ScanExpiryScreenState extends ConsumerState<ScanExpiryScreen> {
 
   Widget _buildResults() {
     if (_candidates.isEmpty) {
-      return const Center(
+      return Center(
         child: Text(
           'Detected dates will appear here.',
-          style: TextStyle(color: AppColors.textSecondary),
+          style: TextStyle(color: Theme.of(context).colorScheme.onSurfaceVariant),
         ),
       );
     }

@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../../../core/constants/app_constants.dart';
 import '../../../../core/extensions/date_extensions.dart';
+import '../../../../core/theme/responsive.dart';
 import '../../../../shared/widgets/common_widgets.dart';
 import '../../domain/entities/product.dart';
 import '../../domain/entities/product_enums.dart';
@@ -226,12 +227,15 @@ class _Header extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final imgSize = Responsive.isSmallDevice ? 56.0 : 72.0;
+    final imgIconSize = Responsive.isSmallDevice ? 26.0 : 34.0;
+
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Container(
-          width: 72,
-          height: 72,
+          width: imgSize,
+          height: imgSize,
           decoration: BoxDecoration(
             color: AppColors.primary.withValues(alpha: 0.08),
             borderRadius: BorderRadius.circular(16),
@@ -244,24 +248,25 @@ class _Header extends StatelessWidget {
           ),
           child: product.imageUrl == null
               ? Icon(product.category.icon,
-                  size: 34, color: AppColors.primary)
+                  size: imgIconSize, color: AppColors.primary)
               : null,
         ),
-        const SizedBox(width: AppSpacing.lg),
+        SizedBox(width: Responsive.isSmallDevice ? AppSpacing.md : AppSpacing.lg),
         Expanded(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
                 product.productName,
-                style: const TextStyle(
-                    fontSize: 20, fontWeight: FontWeight.w800),
+                style: TextStyle(
+                    fontSize: Responsive.fontSize(19),
+                    fontWeight: FontWeight.w800),
               ),
               if (product.brand != null && product.brand!.isNotEmpty) ...[
                 const SizedBox(height: 2),
                 Text(
                   product.brand!,
-                  style: const TextStyle(color: AppColors.textSecondary),
+                  style: TextStyle(color: Theme.of(context).colorScheme.onSurfaceVariant),
                 ),
               ],
               const SizedBox(height: AppSpacing.sm),
@@ -311,27 +316,28 @@ class _DetailsCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final muted = Theme.of(context).colorScheme.onSurfaceVariant;
     return _Card(
       child: Column(
         children: [
-          _row(Icons.category_outlined, 'Category', product.category.label),
+          _row(Icons.category_outlined, 'Category', product.category.label, muted),
           _divider(),
-          _row(Icons.place_outlined, 'Storage', product.storageLocation.label),
+          _row(Icons.place_outlined, 'Storage', product.storageLocation.label, muted),
           _divider(),
           _row(Icons.numbers_outlined, 'Quantity',
-              '${product.quantity} ${product.unit}'),
+              '${product.quantity} ${product.unit}', muted),
           if (product.manufacturingDate != null) ...[
             _divider(),
             _row(Icons.precision_manufacturing_outlined, 'Manufactured',
-                product.manufacturingDate!.displayDate),
+                product.manufacturingDate!.displayDate, muted),
           ],
           if (product.barcode != null && product.barcode!.isNotEmpty) ...[
             _divider(),
-            _row(Icons.qr_code_2_outlined, 'Barcode', product.barcode!),
+            _row(Icons.qr_code_2_outlined, 'Barcode', product.barcode!, muted),
           ],
           _divider(),
           _row(Icons.fact_check_outlined, 'Date source',
-              _sourceLabel(product.parsedBy)),
+              _sourceLabel(product.parsedBy), muted),
         ],
       ),
     );
@@ -345,12 +351,12 @@ class _DetailsCard extends StatelessWidget {
 
   Widget _divider() => const Divider(height: AppSpacing.lg);
 
-  Widget _row(IconData icon, String label, String value) {
+  Widget _row(IconData icon, String label, String value, Color mutedColor) {
     return Row(
       children: [
-        Icon(icon, size: 20, color: AppColors.textSecondary),
+        Icon(icon, size: 20, color: mutedColor),
         const SizedBox(width: AppSpacing.md),
-        Text(label, style: const TextStyle(color: AppColors.textSecondary)),
+        Text(label, style: TextStyle(color: mutedColor)),
         const Spacer(),
         Flexible(
           child: Text(
@@ -433,12 +439,13 @@ class _NoteCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final hasNote = note != null && note!.isNotEmpty;
+    final colors = Theme.of(context).colorScheme;
     return _Card(
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Icon(Icons.sticky_note_2_outlined,
-              size: 20, color: AppColors.textSecondary),
+          Icon(Icons.sticky_note_2_outlined,
+              size: 20, color: colors.onSurfaceVariant),
           const SizedBox(width: AppSpacing.md),
           Expanded(
             child: Column(
@@ -451,8 +458,8 @@ class _NoteCard extends StatelessWidget {
                   hasNote ? note! : 'No note yet.',
                   style: TextStyle(
                     color: hasNote
-                        ? AppColors.textPrimary
-                        : AppColors.textSecondary,
+                        ? colors.onSurface
+                        : colors.onSurfaceVariant,
                   ),
                 ),
               ],
@@ -488,9 +495,13 @@ class _ConsumeButton extends StatelessWidget {
         icon: Icon(isConsumed
             ? Icons.undo_rounded
             : Icons.check_circle_outline_rounded),
-        label: Text(isConsumed ? 'Move back to inventory' : 'Mark as consumed'),
+        label: Text(
+          isConsumed ? 'Move back to inventory' : 'Mark as consumed',
+          style: TextStyle(fontSize: Responsive.fontSize(14)),
+        ),
         style: FilledButton.styleFrom(
-          padding: const EdgeInsets.symmetric(vertical: 14),
+          padding: EdgeInsets.symmetric(
+              vertical: Responsive.isSmallDevice ? 10 : 14),
           backgroundColor:
               isConsumed ? AppColors.textSecondary : AppColors.primary,
         ),
@@ -505,11 +516,12 @@ class _Card extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final pad = Responsive.isSmallDevice ? AppSpacing.md : AppSpacing.lg;
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.all(AppSpacing.lg),
+      padding: EdgeInsets.all(pad),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: Theme.of(context).cardTheme.color ?? Theme.of(context).colorScheme.surface,
         borderRadius: BorderRadius.circular(16),
         border: Border.all(color: AppColors.border),
       ),
