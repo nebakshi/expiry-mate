@@ -16,6 +16,13 @@ class ProductInfo {
     this.category = ProductCategory.other,
     this.source = 'unknown',
     this.found = false,
+    this.calories,
+    this.protein,
+    this.fat,
+    this.carbs,
+    this.fiber,
+    this.sugar,
+    this.nutritionPer = '100g',
   });
 
   final String barcode;
@@ -25,6 +32,15 @@ class ProductInfo {
   final ProductCategory category;
   final String source;
   final bool found;
+  final double? calories;
+  final double? protein;
+  final double? fat;
+  final double? carbs;
+  final double? fiber;
+  final double? sugar;
+  final String nutritionPer;
+
+  bool get hasNutrition => calories != null || protein != null || fat != null;
 }
 
 /// PLAN §16 priority order:
@@ -57,6 +73,12 @@ class ProductLookupService {
           category: ProductCategory.fromWire(d['category'] as String?),
           source: (d['source'] as String?) ?? 'cache',
           found: true,
+          calories: (d['calories'] as num?)?.toDouble(),
+          protein: (d['protein'] as num?)?.toDouble(),
+          fat: (d['fat'] as num?)?.toDouble(),
+          carbs: (d['carbs'] as num?)?.toDouble(),
+          fiber: (d['fiber'] as num?)?.toDouble(),
+          sugar: (d['sugar'] as num?)?.toDouble(),
         ),);
       }
     } catch (_) {
@@ -96,7 +118,7 @@ class ProductLookupService {
   Future<ProductInfo?> _lookupOpenFoodFacts(
       String barcode, String host, String sourceName,) async {
     final uri = Uri.parse(
-      'https://$host/api/v2/product/$barcode?fields=product_name,brands,image_url,categories_tags',
+      'https://$host/api/v2/product/$barcode?fields=product_name,brands,image_url,categories_tags,nutriments',
     );
     final resp = await _client.get(uri, headers: {
       'User-Agent': AppConstants.offUserAgent,
@@ -110,6 +132,8 @@ class ProductLookupService {
     final name = (p['product_name'] as String?)?.trim();
     if (name == null || name.isEmpty) return null;
 
+    final n = p['nutriments'] as Map<String, dynamic>? ?? {};
+
     return ProductInfo(
       barcode: barcode,
       productName: name,
@@ -118,6 +142,12 @@ class ProductLookupService {
       category: _mapCategory(p['categories_tags']),
       source: sourceName,
       found: true,
+      calories: (n['energy-kcal_100g'] as num?)?.toDouble(),
+      protein: (n['proteins_100g'] as num?)?.toDouble(),
+      fat: (n['fat_100g'] as num?)?.toDouble(),
+      carbs: (n['carbohydrates_100g'] as num?)?.toDouble(),
+      fiber: (n['fiber_100g'] as num?)?.toDouble(),
+      sugar: (n['sugars_100g'] as num?)?.toDouble(),
     );
   }
 
@@ -162,10 +192,136 @@ class ProductLookupService {
         'imageUrl': info.imageUrl,
         'category': info.category.wire,
         'source': info.source,
+        'calories': info.calories,
+        'protein': info.protein,
+        'fat': info.fat,
+        'carbs': info.carbs,
+        'fiber': info.fiber,
+        'sugar': info.sugar,
         'cachedAt': FieldValue.serverTimestamp(),
       });
     } catch (_) {
       // Non-critical — ignore cache write failures.
+    }
+  }
+
+  /// Searches OpenFoodFacts by product name. Returns the best match or null.
+  Future<Result<ProductInfo>> searchByName(String query) async {
+    if (query.trim().isEmpty) {
+      return const Err(NotFoundFailure('No search query provided.'));
+    }
+
+    try {
+      final uri = Uri.parse(
+        'https://world.openfoodfacts.org/cgi/search.pl'
+        '?search_terms=${Uri.encodeComponent(query)}'
+        '&search_simple=1&action=process&json=1&page_size=5'
+        '&fields=code,product_name,brands,image_url,categories_tags,nutriments',
+      );
+      final resp = await _client.get(uri, headers: {
+        'User-Agent': AppConstants.offUserAgent,
+      }).timeout(const Duration(seconds: 10));
+
+      if (resp.statusCode != 200) {
+        return const Err(NetworkFailure('Could not reach product database.'));
+      }
+
+      final json = jsonDecode(resp.body) as Map<String, dynamic>;
+      final products = json['products'] as List?;
+      if (products == null || products.isEmpty) {
+        return Err(NotFoundFailure('No results for "$query".'));
+      }
+
+      final results = <ProductInfo>[];
+      for (final p in products) {
+        final map = p as Map<String, dynamic>;
+        final name = (map['product_name'] as String?)?.trim();
+        if (name == null || name.isEmpty) continue;
+
+        final n = map['nutriments'] as Map<String, dynamic>? ?? {};
+        results.add(ProductInfo(
+          barcode: (map['code'] as String?) ?? '',
+          productName: name,
+          brand: (map['brands'] as String?)?.split(',').first.trim(),
+          imageUrl: map['image_url'] as String?,
+          category: _mapCategory(map['categories_tags']),
+          source: 'open_food_facts_search',
+          found: true,
+          calories: (n['energy-kcal_100g'] as num?)?.toDouble(),
+          protein: (n['proteins_100g'] as num?)?.toDouble(),
+          fat: (n['fat_100g'] as num?)?.toDouble(),
+          carbs: (n['carbohydrates_100g'] as num?)?.toDouble(),
+          fiber: (n['fiber_100g'] as num?)?.toDouble(),
+          sugar: (n['sugars_100g'] as num?)?.toDouble(),
+        ));
+      }
+
+      if (results.isEmpty) {
+        return Err(NotFoundFailure('No results for "$query".'));
+      }
+      return Success(results.first);
+    } catch (_) {
+      return const Err(NetworkFailure('Search failed. Check your connection.'));
+    }
+  }
+
+  /// Searches and returns multiple results for user selection.
+  Future<Result<List<ProductInfo>>> searchByNameMultiple(String query) async {
+    if (query.trim().isEmpty) {
+      return const Err(NotFoundFailure('No search query provided.'));
+    }
+
+    try {
+      final uri = Uri.parse(
+        'https://world.openfoodfacts.org/cgi/search.pl'
+        '?search_terms=${Uri.encodeComponent(query)}'
+        '&search_simple=1&action=process&json=1&page_size=10'
+        '&fields=code,product_name,brands,image_url,categories_tags,nutriments',
+      );
+      final resp = await _client.get(uri, headers: {
+        'User-Agent': AppConstants.offUserAgent,
+      }).timeout(const Duration(seconds: 10));
+
+      if (resp.statusCode != 200) {
+        return const Err(NetworkFailure('Could not reach product database.'));
+      }
+
+      final json = jsonDecode(resp.body) as Map<String, dynamic>;
+      final products = json['products'] as List?;
+      if (products == null || products.isEmpty) {
+        return Err(NotFoundFailure('No results for "$query".'));
+      }
+
+      final results = <ProductInfo>[];
+      for (final p in products) {
+        final map = p as Map<String, dynamic>;
+        final name = (map['product_name'] as String?)?.trim();
+        if (name == null || name.isEmpty) continue;
+
+        final n = map['nutriments'] as Map<String, dynamic>? ?? {};
+        results.add(ProductInfo(
+          barcode: (map['code'] as String?) ?? '',
+          productName: name,
+          brand: (map['brands'] as String?)?.split(',').first.trim(),
+          imageUrl: map['image_url'] as String?,
+          category: _mapCategory(map['categories_tags']),
+          source: 'open_food_facts_search',
+          found: true,
+          calories: (n['energy-kcal_100g'] as num?)?.toDouble(),
+          protein: (n['proteins_100g'] as num?)?.toDouble(),
+          fat: (n['fat_100g'] as num?)?.toDouble(),
+          carbs: (n['carbohydrates_100g'] as num?)?.toDouble(),
+          fiber: (n['fiber_100g'] as num?)?.toDouble(),
+          sugar: (n['sugars_100g'] as num?)?.toDouble(),
+        ));
+      }
+
+      if (results.isEmpty) {
+        return Err(NotFoundFailure('No results for "$query".'));
+      }
+      return Success(results);
+    } catch (_) {
+      return const Err(NetworkFailure('Search failed. Check your connection.'));
     }
   }
 

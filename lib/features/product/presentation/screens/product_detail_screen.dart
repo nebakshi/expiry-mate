@@ -1,11 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:image_picker/image_picker.dart';
 
 import '../../../../core/constants/app_constants.dart';
+import '../../../../core/errors/failures.dart';
 import '../../../../core/extensions/date_extensions.dart';
 import '../../../../core/theme/responsive.dart';
 import '../../../../shared/widgets/common_widgets.dart';
+import '../../../recipes/presentation/recipe_providers.dart';
+import '../../../scanner/presentation/scanner_providers.dart';
 import '../../domain/entities/product.dart';
 import '../../domain/entities/product_enums.dart';
 import '../providers/product_providers.dart';
@@ -73,6 +77,14 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
           _ExpiryCard(product: p),
           const SizedBox(height: AppSpacing.lg),
           _DetailsCard(product: p),
+          const SizedBox(height: AppSpacing.lg),
+          _NutritionCard(
+            product: p,
+            enabled: !_busy,
+            onScan: () => _scanNutrition(p),
+          ),
+          const SizedBox(height: AppSpacing.lg),
+          _RecipeButton(productName: p.productName),
           const SizedBox(height: AppSpacing.lg),
           _RemindersCard(
             selected: p.reminderDaysBefore,
@@ -185,6 +197,50 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
       );
     } else {
       showError(context, 'Could not update status');
+    }
+  }
+
+  Future<void> _scanNutrition(Product p) async {
+    final picker = ImagePicker();
+    final shot = await picker.pickImage(
+      source: ImageSource.camera,
+      imageQuality: 90,
+    );
+    if (shot == null || !mounted) return;
+
+    final ocrRes =
+        await ref.read(ocrServiceProvider).recogniseFromFile(shot.path);
+    if (!mounted) return;
+
+    switch (ocrRes) {
+      case Success(:final value):
+        final data = ref.read(nutritionParserProvider).parse(value);
+        if (data == null) {
+          showError(context,
+              'Could not detect nutrition info. Try with clearer focus.');
+          return;
+        }
+        final updated = p.copyWith(
+          calories: data.calories,
+          protein: data.protein,
+          fat: data.fat,
+          carbs: data.carbs,
+          fiber: data.fiber,
+          sugar: data.sugar,
+          nutritionSource: 'OCR',
+          updatedAt: DateTime.now(),
+        );
+        final ok =
+            await ref.read(productControllerProvider.notifier).update(updated);
+        if (!mounted) return;
+        if (ok) {
+          setState(() => _product = updated);
+          showSuccess(context, 'Nutrition info updated');
+        } else {
+          showError(context, 'Could not save nutrition data');
+        }
+      case Err(:final failure):
+        showError(context, failure.message);
     }
   }
 
@@ -471,6 +527,156 @@ class _NoteCard extends StatelessWidget {
           ),
         ],
       ),
+    );
+  }
+}
+
+class _RecipeButton extends ConsumerWidget {
+  const _RecipeButton({required this.productName});
+  final String productName;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final quota = ref.watch(recipeQuotaProvider);
+    final hasQuota = quota.valueOrNull ?? false;
+    if (!hasQuota) return const SizedBox.shrink();
+
+    return SizedBox(
+      width: double.infinity,
+      child: OutlinedButton.icon(
+        onPressed: () => context.push('/recipes', extra: [productName]),
+        icon: const Icon(Icons.restaurant_outlined, size: 18),
+        label: const Text('Get recipe ideas'),
+      ),
+    );
+  }
+}
+
+class _NutritionCard extends StatelessWidget {
+  const _NutritionCard({
+    required this.product,
+    required this.enabled,
+    required this.onScan,
+  });
+
+  final Product product;
+  final bool enabled;
+  final VoidCallback onScan;
+
+  @override
+  Widget build(BuildContext context) {
+    final hasData = product.hasNutrition;
+    final colors = Theme.of(context).colorScheme;
+
+    return _Card(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Icon(Icons.local_fire_department_outlined,
+                  size: 20, color: colors.onSurfaceVariant),
+              const SizedBox(width: AppSpacing.sm),
+              const Expanded(
+                child: Text('Nutrition',
+                    style:
+                        TextStyle(fontWeight: FontWeight.w700, fontSize: 16)),
+              ),
+              TextButton.icon(
+                onPressed: enabled ? onScan : null,
+                icon: Icon(hasData ? Icons.refresh : Icons.camera_alt_outlined,
+                    size: 16),
+                label: Text(hasData ? 'Update' : 'Scan label'),
+              ),
+            ],
+          ),
+          if (hasData) ...[
+            if (product.nutritionSource != null)
+              Padding(
+                padding: const EdgeInsets.only(bottom: AppSpacing.sm),
+                child: Text(
+                  'Per ${product.nutritionPer} · Source: ${_sourceLabel(product.nutritionSource!)}',
+                  style: TextStyle(fontSize: 12, color: colors.onSurfaceVariant),
+                ),
+              ),
+            _NutritionRow(
+              items: [
+                if (product.calories != null)
+                  _NutrientItem('Calories', '${product.calories!.toStringAsFixed(0)}', 'kcal'),
+                if (product.protein != null)
+                  _NutrientItem('Protein', product.protein!.toStringAsFixed(1), 'g'),
+                if (product.fat != null)
+                  _NutrientItem('Fat', product.fat!.toStringAsFixed(1), 'g'),
+              ],
+            ),
+            if (product.carbs != null || product.fiber != null || product.sugar != null) ...[
+              const SizedBox(height: AppSpacing.sm),
+              _NutritionRow(
+                items: [
+                  if (product.carbs != null)
+                    _NutrientItem('Carbs', product.carbs!.toStringAsFixed(1), 'g'),
+                  if (product.fiber != null)
+                    _NutrientItem('Fiber', product.fiber!.toStringAsFixed(1), 'g'),
+                  if (product.sugar != null)
+                    _NutrientItem('Sugar', product.sugar!.toStringAsFixed(1), 'g'),
+                ],
+              ),
+            ],
+          ] else
+            Padding(
+              padding: const EdgeInsets.only(top: AppSpacing.sm),
+              child: Text(
+                'No nutrition data yet.',
+                style: TextStyle(color: colors.onSurfaceVariant),
+              ),
+            ),
+        ],
+      ),
+    );
+  }
+
+  String _sourceLabel(String source) => switch (source.toUpperCase()) {
+        'API' => 'Product database',
+        'OCR' => 'Scanned',
+        _ => 'Manual',
+      };
+}
+
+class _NutrientItem {
+  const _NutrientItem(this.label, this.value, this.unit);
+  final String label;
+  final String value;
+  final String unit;
+}
+
+class _NutritionRow extends StatelessWidget {
+  const _NutritionRow({required this.items});
+  final List<_NutrientItem> items;
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: items
+          .map((item) => Expanded(
+                child: Column(
+                  children: [
+                    Text(
+                      '${item.value}${item.unit}',
+                      style: const TextStyle(
+                          fontSize: 18, fontWeight: FontWeight.w800),
+                    ),
+                    const SizedBox(height: 2),
+                    Text(
+                      item.label,
+                      style: TextStyle(
+                        fontSize: 12,
+                        color: Theme.of(context).colorScheme.onSurfaceVariant,
+                      ),
+                    ),
+                  ],
+                ),
+              ))
+          .toList(),
     );
   }
 }

@@ -71,6 +71,18 @@ class ProductCard extends StatelessWidget {
                         ],
                       ],
                     ),
+                    if (product.hasNutrition) ...[
+                      const SizedBox(height: 4),
+                      Text(
+                        _nutritionSummary(product),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: TextStyle(
+                          fontSize: Responsive.fontSize(11),
+                          color: Theme.of(context).colorScheme.onSurfaceVariant,
+                        ),
+                      ),
+                    ],
                   ],
                 ),
               ),
@@ -101,6 +113,20 @@ class ProductCard extends StatelessWidget {
       ),
     );
   }
+}
+
+String _nutritionSummary(Product product) {
+  final parts = <String>[];
+  if (product.calories != null) {
+    parts.add('${product.calories!.toStringAsFixed(0)} kcal');
+  }
+  if (product.protein != null) {
+    parts.add('${product.protein!.toStringAsFixed(1)}g P');
+  }
+  if (product.fat != null) {
+    parts.add('${product.fat!.toStringAsFixed(1)}g F');
+  }
+  return parts.join(' · ');
 }
 
 class _Thumb extends StatelessWidget {

@@ -26,6 +26,14 @@ class Product extends Equatable {
     this.notificationIds = const [],
     this.note,
     this.isConsumed = false,
+    this.calories,
+    this.protein,
+    this.fat,
+    this.carbs,
+    this.fiber,
+    this.sugar,
+    this.nutritionPer = '100g',
+    this.nutritionSource,
     required this.createdAt,
     required this.updatedAt,
   });
@@ -49,6 +57,14 @@ class Product extends Equatable {
   final List<int> notificationIds;
   final String? note;
   final bool isConsumed;
+  final double? calories;
+  final double? protein;
+  final double? fat;
+  final double? carbs;
+  final double? fiber;
+  final double? sugar;
+  final String nutritionPer;
+  final String? nutritionSource; // API | OCR | MANUAL
   final DateTime createdAt;
   final DateTime updatedAt;
 
@@ -61,6 +77,8 @@ class Product extends Equatable {
   }
 
   bool get isExpiredNow => isExpired(expiryDate);
+
+  bool get hasNutrition => calories != null || protein != null || fat != null;
 
   Product copyWith({
     String? productName,
@@ -80,6 +98,14 @@ class Product extends Equatable {
     List<int>? notificationIds,
     String? note,
     bool? isConsumed,
+    double? calories,
+    double? protein,
+    double? fat,
+    double? carbs,
+    double? fiber,
+    double? sugar,
+    String? nutritionPer,
+    String? nutritionSource,
     DateTime? updatedAt,
   }) {
     return Product(
@@ -102,6 +128,14 @@ class Product extends Equatable {
       notificationIds: notificationIds ?? this.notificationIds,
       note: note ?? this.note,
       isConsumed: isConsumed ?? this.isConsumed,
+      calories: calories ?? this.calories,
+      protein: protein ?? this.protein,
+      fat: fat ?? this.fat,
+      carbs: carbs ?? this.carbs,
+      fiber: fiber ?? this.fiber,
+      sugar: sugar ?? this.sugar,
+      nutritionPer: nutritionPer ?? this.nutritionPer,
+      nutritionSource: nutritionSource ?? this.nutritionSource,
       createdAt: createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
     );
@@ -129,6 +163,14 @@ class Product extends Equatable {
         'isConsumed': isConsumed,
         'isExpired': isExpiredNow,
         'note': note,
+        'calories': calories,
+        'protein': protein,
+        'fat': fat,
+        'carbs': carbs,
+        'fiber': fiber,
+        'sugar': sugar,
+        'nutritionPer': nutritionPer,
+        'nutritionSource': nutritionSource,
         'createdAt': Timestamp.fromDate(createdAt),
         'updatedAt': Timestamp.fromDate(updatedAt),
       };
@@ -169,6 +211,14 @@ class Product extends Equatable {
           const [],
       note: d['note'] as String?,
       isConsumed: (d['isConsumed'] as bool?) ?? false,
+      calories: (d['calories'] as num?)?.toDouble(),
+      protein: (d['protein'] as num?)?.toDouble(),
+      fat: (d['fat'] as num?)?.toDouble(),
+      carbs: (d['carbs'] as num?)?.toDouble(),
+      fiber: (d['fiber'] as num?)?.toDouble(),
+      sugar: (d['sugar'] as num?)?.toDouble(),
+      nutritionPer: (d['nutritionPer'] as String?) ?? '100g',
+      nutritionSource: d['nutritionSource'] as String?,
       createdAt: parseDate(d['createdAt'], fallback: DateTime.now()),
       updatedAt: parseDate(d['updatedAt'], fallback: DateTime.now()),
     );
@@ -195,6 +245,14 @@ class Product extends Equatable {
         notificationIds,
         note,
         isConsumed,
+        calories,
+        protein,
+        fat,
+        carbs,
+        fiber,
+        sugar,
+        nutritionPer,
+        nutritionSource,
         createdAt,
         updatedAt,
       ];

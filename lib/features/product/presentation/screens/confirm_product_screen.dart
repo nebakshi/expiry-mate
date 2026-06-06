@@ -87,6 +87,14 @@ class _ConfirmProductScreenState extends ConsumerState<ConfirmProductScreen> {
       ocrRawText: widget.draft.ocrRawText,
       parsedBy: widget.draft.parsedBy,
       reminderDaysBefore: _reminders..sort((a, b) => b.compareTo(a)),
+      calories: widget.draft.calories,
+      protein: widget.draft.protein,
+      fat: widget.draft.fat,
+      carbs: widget.draft.carbs,
+      fiber: widget.draft.fiber,
+      sugar: widget.draft.sugar,
+      nutritionPer: widget.draft.nutritionPer,
+      nutritionSource: widget.draft.nutritionSource,
       createdAt: now,
       updatedAt: now,
     );
@@ -194,6 +202,26 @@ class _ConfirmProductScreenState extends ConsumerState<ConfirmProductScreen> {
                 keyboardType: TextInputType.number,
                 decoration: const InputDecoration(hintText: '1'),
               ),
+              if (widget.draft.hasNutrition) ...[
+                const SizedBox(height: AppSpacing.md),
+                _label('Nutrition (per ${widget.draft.nutritionPer})'),
+                Card(
+                  child: Padding(
+                    padding: const EdgeInsets.all(AppSpacing.md),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceAround,
+                      children: [
+                        if (widget.draft.calories != null)
+                          _nutrientChip('${widget.draft.calories!.toStringAsFixed(0)} kcal', 'Cal'),
+                        if (widget.draft.protein != null)
+                          _nutrientChip('${widget.draft.protein!.toStringAsFixed(1)}g', 'Protein'),
+                        if (widget.draft.fat != null)
+                          _nutrientChip('${widget.draft.fat!.toStringAsFixed(1)}g', 'Fat'),
+                      ],
+                    ),
+                  ),
+                ),
+              ],
               const SizedBox(height: AppSpacing.md),
               _label('Expiry date'),
               InkWell(
@@ -238,6 +266,20 @@ class _ConfirmProductScreenState extends ConsumerState<ConfirmProductScreen> {
         child: Text(text,
             style: const TextStyle(
                 fontWeight: FontWeight.w600, fontSize: 14)),
+      );
+
+  Widget _nutrientChip(String value, String label) => Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Text(value,
+              style:
+                  const TextStyle(fontWeight: FontWeight.w700, fontSize: 15)),
+          const SizedBox(height: 2),
+          Text(label,
+              style: TextStyle(
+                  fontSize: 11,
+                  color: Theme.of(context).colorScheme.onSurfaceVariant)),
+        ],
       );
 }
 

@@ -57,6 +57,7 @@ class ProductRepository {
       final now = DateTime.now();
       final toSave = product.copyWith(updatedAt: now).copyWithId(id, now);
       await _col(product.userId).doc(id).set(toSave.toFirestore());
+      _contributeToBarcodeCache(toSave);
       return Success(toSave);
     } on FirebaseException catch (e) {
       return Err(StorageFailure(e.message ?? 'Could not save product.'));
@@ -124,6 +125,33 @@ class ProductRepository {
         await _col(userId).where('isConsumed', isEqualTo: false).count().get();
     return snap.count ?? 0;
   }
+
+  /// Contributes product data to the shared barcode cache so future scans
+  /// by any user auto-fill product info + nutrition.
+  Future<void> _contributeToBarcodeCache(Product product) async {
+    if (product.barcode == null || product.barcode!.isEmpty) return;
+    try {
+      await _db
+          .collection(AppConstants.barcodeCacheCollection)
+          .doc(product.barcode)
+          .set({
+        'productName': product.productName,
+        'brand': product.brand,
+        'imageUrl': product.imageUrl,
+        'category': product.category.wire,
+        'source': 'community',
+        'calories': product.calories,
+        'protein': product.protein,
+        'fat': product.fat,
+        'carbs': product.carbs,
+        'fiber': product.fiber,
+        'sugar': product.sugar,
+        'cachedAt': FieldValue.serverTimestamp(),
+      }, SetOptions(merge: true));
+    } catch (_) {
+      // Non-critical — ignore cache write failures.
+    }
+  }
 }
 
 /// Small private helper to set the immutable id/createdAt on a fresh product.
@@ -149,6 +177,14 @@ extension on Product {
       notificationIds: notificationIds,
       note: note,
       isConsumed: isConsumed,
+      calories: calories,
+      protein: protein,
+      fat: fat,
+      carbs: carbs,
+      fiber: fiber,
+      sugar: sugar,
+      nutritionPer: nutritionPer,
+      nutritionSource: nutritionSource,
       createdAt: createdAt,
       updatedAt: now,
     );

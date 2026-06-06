@@ -10,3 +10,8 @@
 
 -keep class io.flutter.** { *; }
 -keep class io.flutter.plugins.** { *; }
+
+# Play Core (deferred components / split install)
+-dontwarn com.google.android.play.core.splitcompat.SplitCompatApplication
+-dontwarn com.google.android.play.core.splitinstall.**
+-dontwarn com.google.android.play.core.tasks.**

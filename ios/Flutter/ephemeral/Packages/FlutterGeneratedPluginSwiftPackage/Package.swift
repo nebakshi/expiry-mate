@@ -9,7 +9,7 @@ import PackageDescription
 let package = Package(
     name: "FlutterGeneratedPluginSwiftPackage",
     platforms: [
-        .iOS("15.5")
+        .iOS("13.0")
     ],
     products: [
         .library(name: "FlutterGeneratedPluginSwiftPackage", type: .static, targets: ["FlutterGeneratedPluginSwiftPackage"])
@@ -24,6 +24,7 @@ let package = Package(
         .package(name: "firebase_crashlytics", path: "../.packages/firebase_crashlytics-4.3.10"),
         .package(name: "firebase_auth", path: "../.packages/firebase_auth-5.7.0"),
         .package(name: "firebase_analytics", path: "../.packages/firebase_analytics-11.6.0"),
+        .package(name: "firebase_app_check", path: "../.packages/firebase_app_check-0.3.2+10"),
         .package(name: "connectivity_plus", path: "../.packages/connectivity_plus-6.1.5"),
         .package(name: "cloud_firestore", path: "../.packages/cloud_firestore-5.6.12"),
         .package(name: "camera_avfoundation", path: "../.packages/camera_avfoundation-0.9.23+2"),
@@ -42,6 +43,7 @@ let package = Package(
                 .product(name: "firebase-crashlytics", package: "firebase_crashlytics"),
                 .product(name: "firebase-auth", package: "firebase_auth"),
                 .product(name: "firebase-analytics", package: "firebase_analytics"),
+                .product(name: "firebase-app-check", package: "firebase_app_check"),
                 .product(name: "connectivity-plus", package: "connectivity_plus"),
                 .product(name: "cloud-firestore", package: "cloud_firestore"),
                 .product(name: "camera-avfoundation", package: "camera_avfoundation"),

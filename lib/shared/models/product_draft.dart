@@ -17,6 +17,14 @@ class ProductDraft {
     this.ocrRawText,
     this.parsedBy = 'MANUAL',
     this.lookupSource,
+    this.calories,
+    this.protein,
+    this.fat,
+    this.carbs,
+    this.fiber,
+    this.sugar,
+    this.nutritionPer = '100g',
+    this.nutritionSource,
   });
 
   factory ProductDraft.empty() => ProductDraft();
@@ -34,6 +42,16 @@ class ProductDraft {
   String? ocrRawText;
   String parsedBy;
   String? lookupSource;
+  double? calories;
+  double? protein;
+  double? fat;
+  double? carbs;
+  double? fiber;
+  double? sugar;
+  String nutritionPer;
+  String? nutritionSource;
+
+  bool get hasNutrition => calories != null || protein != null || fat != null;
 
   ProductDraft copyWith({
     String? barcode,
@@ -49,6 +67,14 @@ class ProductDraft {
     String? ocrRawText,
     String? parsedBy,
     String? lookupSource,
+    double? calories,
+    double? protein,
+    double? fat,
+    double? carbs,
+    double? fiber,
+    double? sugar,
+    String? nutritionPer,
+    String? nutritionSource,
   }) {
     return ProductDraft(
       barcode: barcode ?? this.barcode,
@@ -64,6 +90,14 @@ class ProductDraft {
       ocrRawText: ocrRawText ?? this.ocrRawText,
       parsedBy: parsedBy ?? this.parsedBy,
       lookupSource: lookupSource ?? this.lookupSource,
+      calories: calories ?? this.calories,
+      protein: protein ?? this.protein,
+      fat: fat ?? this.fat,
+      carbs: carbs ?? this.carbs,
+      fiber: fiber ?? this.fiber,
+      sugar: sugar ?? this.sugar,
+      nutritionPer: nutritionPer ?? this.nutritionPer,
+      nutritionSource: nutritionSource ?? this.nutritionSource,
     );
   }
 }

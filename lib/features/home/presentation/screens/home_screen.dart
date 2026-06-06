@@ -6,9 +6,11 @@ import '../../../../core/constants/app_constants.dart';
 import '../../../../core/theme/responsive.dart';
 import '../../../auth/presentation/providers/auth_providers.dart';
 import '../../../product/domain/entities/product.dart';
+import '../../../product/domain/entities/product_enums.dart';
 import '../../../../shared/widgets/common_widgets.dart';
 import '../../../product/presentation/providers/product_providers.dart';
 import '../../../product/presentation/widgets/product_card.dart';
+import '../../../recipes/presentation/recipe_providers.dart';
 
 class HomeScreen extends ConsumerWidget {
   const HomeScreen({super.key});
@@ -227,12 +229,49 @@ class _FilterChips extends StatelessWidget {
   }
 }
 
-class _InventoryList extends StatelessWidget {
+class _RecipeBannerCard extends StatelessWidget {
+  const _RecipeBannerCard({required this.count, required this.onTap});
+  final int count;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return Card(
+      child: InkWell(
+        borderRadius: BorderRadius.circular(AppSpacing.radius),
+        onTap: onTap,
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md, vertical: 12),
+          child: Row(
+            children: [
+              const Icon(Icons.restaurant_outlined,
+                  color: AppColors.primary, size: 20),
+              const SizedBox(width: AppSpacing.sm),
+              Expanded(
+                child: Text(
+                  '$count item${count > 1 ? 's' : ''} expiring — get recipe ideas',
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(
+                      fontSize: Responsive.fontSize(13),
+                      fontWeight: FontWeight.w600),
+                ),
+              ),
+              const Icon(Icons.chevron_right, size: 18),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _InventoryList extends ConsumerWidget {
   const _InventoryList({required this.products});
   final List<Product> products;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     if (products.isEmpty) {
       return EmptyState(
         icon: Icons.kitchen_outlined,
@@ -246,13 +285,32 @@ class _InventoryList extends StatelessWidget {
         ),
       );
     }
+
+    final allProducts = ref.watch(inventoryStreamProvider).valueOrNull ?? const [];
+    final expiring = allProducts
+        .where((p) => p.status == ProductStatus.expiringSoon)
+        .toList();
+    final quota = ref.watch(recipeQuotaProvider);
+    final hasQuota = quota.valueOrNull ?? false;
+    final showBanner = expiring.isNotEmpty && hasQuota;
+
     return ListView.separated(
       padding: const EdgeInsets.fromLTRB(
           AppSpacing.md, 0, AppSpacing.md, 96),
-      itemCount: products.length,
+      itemCount: products.length + (showBanner ? 1 : 0),
       separatorBuilder: (_, __) => const SizedBox(height: AppSpacing.sm),
       itemBuilder: (_, i) {
-        final p = products[i];
+        if (showBanner && i == 0) {
+          return _RecipeBannerCard(
+            count: expiring.length,
+            onTap: () {
+              final names = expiring.map((p) => p.productName).toList();
+              context.push('/recipes', extra: names);
+            },
+          );
+        }
+        final index = showBanner ? i - 1 : i;
+        final p = products[index];
         return ProductCard(
           product: p,
           onTap: () => context.push('/product', extra: p),

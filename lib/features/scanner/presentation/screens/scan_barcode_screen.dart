@@ -101,6 +101,13 @@ class _ScanBarcodeScreenState extends ConsumerState<ScanBarcodeScreen> {
           category: value.category,
           parsedBy: 'API',
           lookupSource: value.source,
+          calories: value.calories,
+          protein: value.protein,
+          fat: value.fat,
+          carbs: value.carbs,
+          fiber: value.fiber,
+          sugar: value.sugar,
+          nutritionSource: value.hasNutrition ? 'API' : null,
         );
       case Err(:final failure):
         // Not found / offline → still proceed, user enters name (PLAN §16).

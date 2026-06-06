@@ -9,6 +9,7 @@ import '../../../../core/extensions/date_extensions.dart';
 import '../../../../shared/models/product_draft.dart';
 import '../../../../shared/widgets/common_widgets.dart';
 import '../../../expiry_parser/domain/expiry_date_candidate.dart';
+import '../../data/product_lookup_service.dart';
 import '../scanner_providers.dart';
 
 class ScanExpiryScreen extends ConsumerStatefulWidget {
@@ -24,6 +25,7 @@ class _ScanExpiryScreenState extends ConsumerState<ScanExpiryScreen> {
   bool _busy = false;
   String? _rawText;
   List<ExpiryDateCandidate> _candidates = const [];
+  late ProductDraft _draft = widget.draft;
 
   Future<void> _capture() async {
     setState(() => _busy = true);
@@ -66,12 +68,45 @@ class _ScanExpiryScreenState extends ConsumerState<ScanExpiryScreen> {
   }
 
   void _proceed(DateTime expiry, {String parsedBy = 'OCR'}) {
-    final draft = widget.draft.copyWith(
+    final draft = _draft.copyWith(
       expiryDate: expiry,
       ocrRawText: _rawText,
       parsedBy: parsedBy,
     );
-    context.pushReplacement('/confirm', extra: draft);
+    if (draft.hasNutrition) {
+      context.pushReplacement('/confirm', extra: draft);
+    } else {
+      context.pushReplacement('/scan-nutrition', extra: draft);
+    }
+  }
+
+  Future<void> _searchByName() async {
+    final controller = TextEditingController();
+    final result = await showDialog<ProductInfo>(
+      context: context,
+      builder: (ctx) => _ProductSearchDialog(
+        controller: controller,
+        lookupService: ref.read(productLookupServiceProvider),
+      ),
+    );
+    if (result != null && mounted) {
+      setState(() {
+        _draft = _draft.copyWith(
+          productName: result.productName,
+          brand: result.brand,
+          imageUrl: result.imageUrl,
+          category: result.category,
+          calories: result.calories,
+          protein: result.protein,
+          fat: result.fat,
+          carbs: result.carbs,
+          fiber: result.fiber,
+          sugar: result.sugar,
+          nutritionSource: result.hasNutrition ? 'API' : null,
+          lookupSource: result.source,
+        );
+      });
+    }
   }
 
   Future<void> _pickManualDate() async {
@@ -95,7 +130,7 @@ class _ScanExpiryScreenState extends ConsumerState<ScanExpiryScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              if (widget.draft.productName != null)
+              if (_draft.productName != null)
                 Card(
                   child: Padding(
                     padding: const EdgeInsets.all(AppSpacing.md),
@@ -106,8 +141,8 @@ class _ScanExpiryScreenState extends ConsumerState<ScanExpiryScreen> {
                         const SizedBox(width: AppSpacing.sm),
                         Expanded(
                           child: Text(
-                            '${widget.draft.productName}'
-                            '${widget.draft.brand != null ? ' · ${widget.draft.brand}' : ''}',
+                            '${_draft.productName}'
+                            '${_draft.brand != null ? ' · ${_draft.brand}' : ''}',
                             style: const TextStyle(
                                 fontWeight: FontWeight.w600),
                           ),
@@ -115,6 +150,12 @@ class _ScanExpiryScreenState extends ConsumerState<ScanExpiryScreen> {
                       ],
                     ),
                   ),
+                )
+              else
+                OutlinedButton.icon(
+                  onPressed: _searchByName,
+                  icon: const Icon(Icons.search),
+                  label: const Text('Search product by name'),
                 ),
               const SizedBox(height: AppSpacing.md),
               Text(
@@ -183,6 +224,151 @@ class _ScanExpiryScreenState extends ConsumerState<ScanExpiryScreen> {
               ),
             )),
       ],
+    );
+  }
+}
+
+class _ProductSearchDialog extends StatefulWidget {
+  const _ProductSearchDialog({
+    required this.controller,
+    required this.lookupService,
+  });
+
+  final TextEditingController controller;
+  final ProductLookupService lookupService;
+
+  @override
+  State<_ProductSearchDialog> createState() => _ProductSearchDialogState();
+}
+
+class _ProductSearchDialogState extends State<_ProductSearchDialog> {
+  List<ProductInfo> _results = [];
+  bool _searching = false;
+  String? _error;
+
+  Future<void> _search() async {
+    final query = widget.controller.text.trim();
+    if (query.isEmpty) return;
+
+    setState(() {
+      _searching = true;
+      _error = null;
+    });
+
+    final res = await widget.lookupService.searchByNameMultiple(query);
+    if (!mounted) return;
+
+    switch (res) {
+      case Success(:final value):
+        setState(() {
+          _results = value;
+          _searching = false;
+        });
+      case Err(:final failure):
+        setState(() {
+          _error = failure.message;
+          _results = [];
+          _searching = false;
+        });
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Dialog(
+      insetPadding: const EdgeInsets.all(AppSpacing.lg),
+      child: Padding(
+        padding: const EdgeInsets.all(AppSpacing.lg),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            const Text('Search product',
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700)),
+            const SizedBox(height: AppSpacing.md),
+            Row(
+              children: [
+                Expanded(
+                  child: TextField(
+                    controller: widget.controller,
+                    autofocus: true,
+                    decoration: const InputDecoration(
+                      hintText: 'e.g. Maggi ketchup',
+                      isDense: true,
+                    ),
+                    onSubmitted: (_) => _search(),
+                  ),
+                ),
+                const SizedBox(width: AppSpacing.sm),
+                IconButton.filled(
+                  onPressed: _searching ? null : _search,
+                  icon: const Icon(Icons.search),
+                ),
+              ],
+            ),
+            const SizedBox(height: AppSpacing.md),
+            if (_searching)
+              const Center(child: CircularProgressIndicator())
+            else if (_error != null)
+              Text(_error!,
+                  style: TextStyle(
+                      color: Theme.of(context).colorScheme.error))
+            else if (_results.isNotEmpty)
+              ConstrainedBox(
+                constraints: BoxConstraints(
+                  maxHeight: MediaQuery.sizeOf(context).height * 0.4,
+                ),
+                child: ListView.builder(
+                  shrinkWrap: true,
+                  itemCount: _results.length,
+                  itemBuilder: (_, i) {
+                    final p = _results[i];
+                    return ListTile(
+                      dense: true,
+                      leading: p.imageUrl != null
+                          ? ClipRRect(
+                              borderRadius: BorderRadius.circular(6),
+                              child: Image.network(
+                                p.imageUrl!,
+                                width: 36,
+                                height: 36,
+                                fit: BoxFit.cover,
+                                errorBuilder: (_, __, ___) =>
+                                    const Icon(Icons.fastfood_outlined),
+                              ),
+                            )
+                          : const Icon(Icons.fastfood_outlined),
+                      title: Text(p.productName ?? '',
+                          maxLines: 1, overflow: TextOverflow.ellipsis),
+                      subtitle: Text(
+                        [
+                          if (p.brand != null) p.brand,
+                          if (p.hasNutrition)
+                            '${p.calories?.toStringAsFixed(0) ?? '?'} kcal',
+                        ].join(' · '),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: const TextStyle(fontSize: 12),
+                      ),
+                      onTap: () => Navigator.pop(context, p),
+                    );
+                  },
+                ),
+              )
+            else
+              Text(
+                'Type a product name and search.',
+                style: TextStyle(
+                    color: Theme.of(context).colorScheme.onSurfaceVariant),
+              ),
+            const SizedBox(height: AppSpacing.sm),
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text('Cancel'),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }

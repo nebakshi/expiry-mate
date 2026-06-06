@@ -11,8 +11,10 @@ import '../../features/product/domain/entities/product.dart';
 import '../../shared/models/product_draft.dart';
 import '../../features/product/presentation/screens/confirm_product_screen.dart';
 import '../../features/product/presentation/screens/product_detail_screen.dart';
+import '../../features/recipes/presentation/recipe_suggestions_screen.dart';
 import '../../features/scanner/presentation/screens/scan_barcode_screen.dart';
 import '../../features/scanner/presentation/screens/scan_expiry_screen.dart';
+import '../../features/scanner/presentation/screens/scan_nutrition_screen.dart';
 import '../../features/settings/presentation/settings_screen.dart';
 
 final onboardingSeenProvider = StateProvider<bool>((ref) => true);
@@ -73,6 +75,13 @@ final routerProvider = Provider<GoRouter>((ref) {
         },
       ),
       GoRoute(
+        path: '/scan-nutrition',
+        builder: (context, state) {
+          final draft = state.extra as ProductDraft?;
+          return ScanNutritionScreen(draft: draft ?? ProductDraft.empty());
+        },
+      ),
+      GoRoute(
         path: '/confirm',
         builder: (context, state) {
           final draft = state.extra as ProductDraft?;
@@ -83,6 +92,13 @@ final routerProvider = Provider<GoRouter>((ref) {
         path: '/product',
         builder: (context, state) =>
             ProductDetailScreen(product: state.extra as Product),
+      ),
+      GoRoute(
+        path: '/recipes',
+        builder: (context, state) {
+          final names = state.extra as List<String>? ?? const [];
+          return RecipeSuggestionsScreen(productNames: names);
+        },
       ),
       GoRoute(path: '/settings', builder: (_, __) => const SettingsScreen()),
     ],
