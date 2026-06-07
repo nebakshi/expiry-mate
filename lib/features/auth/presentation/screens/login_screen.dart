@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/constants/app_constants.dart';
 import '../../../../core/errors/failures.dart';
+import '../../../../core/l10n/l10n.dart';
 import '../../../../core/theme/responsive.dart';
 import '../../../../shared/widgets/common_widgets.dart';
 import '../providers/auth_providers.dart';
@@ -67,27 +68,27 @@ class LoginScreen extends ConsumerWidget {
                 SizedBox(height: Responsive.hp(10)),
                 _AuthButton(
                   icon: Icons.g_mobiledata_rounded,
-                  label: 'Continue with Google',
+                  label: context.l10n.continueWithGoogle,
                   onPressed: loading ? null : controller.signInWithGoogle,
                 ),
                 if (Platform.isIOS || Platform.isMacOS) ...[
                   const SizedBox(height: AppSpacing.md),
                   _AuthButton(
                     icon: Icons.apple,
-                    label: 'Continue with Apple',
+                    label: context.l10n.continueWithApple,
                     onPressed: loading ? null : controller.signInWithApple,
                   ),
                 ],
                 const SizedBox(height: AppSpacing.md),
                 OutlinedButton(
                   onPressed: loading ? null : controller.signInAsGuest,
-                  child: const Text('Continue as Guest'),
+                  child: Text(context.l10n.continueAsGuest),
                 ),
                 SizedBox(height: Responsive.isSmallDevice ? AppSpacing.md : AppSpacing.lg),
                 if (loading) const CircularProgressIndicator(),
                 const SizedBox(height: AppSpacing.sm),
                 Text(
-                  'By continuing you agree to our Terms and Privacy Policy.',
+                  context.l10n.legalText,
                   textAlign: TextAlign.center,
                   style: TextStyle(
                       fontSize: Responsive.fontSize(12),

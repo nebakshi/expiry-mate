@@ -1,0 +1,319 @@
+{
+  "@@locale": "en",
+
+  "appName": "Bloom",
+  "tagline": "Keep it fresh. Always.",
+
+  "skip": "Skip",
+  "next": "Next",
+  "getStarted": "Get started",
+  "cancel": "Cancel",
+  "save": "Save",
+  "delete": "Delete",
+  "retry": "Retry",
+  "edit": "Edit",
+  "add": "Add",
+
+  "onboardingTitle1": "Scan in seconds",
+  "onboardingBody1": "Point your camera at a barcode and we identify the product instantly.",
+  "onboardingTitle2": "Read the expiry date",
+  "onboardingBody2": "Scan the printed date — our India-first parser handles MFG + best-before too.",
+  "onboardingTitle3": "Never miss an expiry",
+  "onboardingBody3": "Get reminders 7 days, 2 days, and on the day an item expires.",
+  "onboardingTitle4": "Waste less food",
+  "onboardingBody4": "Track your whole kitchen in one place and use things before they spoil.",
+
+  "continueWithGoogle": "Continue with Google",
+  "continueWithApple": "Continue with Apple",
+  "continueAsGuest": "Continue as Guest",
+  "legalText": "By continuing you agree to our Terms and Privacy Policy.",
+
+  "homeGreeting": "Hi{name} 👋",
+  "@homeGreeting": {
+    "placeholders": {
+      "name": { "type": "String" }
+    }
+  },
+  "scan": "Scan",
+  "searchHint": "Search products or brands",
+  "tracked": "Tracked",
+  "expiring": "Expiring",
+  "expired": "Expired",
+  "filterAll": "All",
+  "filterFresh": "Fresh",
+  "filterExpiringSoon": "Expiring soon",
+  "filterExpired": "Expired",
+  "recipeBanner": "{count, plural, =1{1 item expiring — get recipe ideas} other{{count} items expiring — get recipe ideas}}",
+  "@recipeBanner": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+  "emptyKitchenTitle": "Your kitchen is empty",
+  "emptyKitchenMessage": "Scan your first product to start tracking expiry dates and get timely reminders.",
+  "scanAProduct": "Scan a product",
+
+  "settings": "Settings",
+  "guest": "Guest",
+  "account": "Account",
+  "appearance": "Appearance",
+  "reminders": "Reminders",
+  "data": "Data",
+  "about": "About",
+  "accountActions": "Account actions",
+  "notificationPermission": "Notification permission",
+  "allowBloomAlerts": "Allow Bloom to send expiry alerts",
+  "exportMyData": "Export my data",
+  "exportSubtitle": "Copy your inventory as JSON",
+  "privacyPolicy": "Privacy policy",
+  "termsAndConditions": "Terms & conditions",
+  "version": "Version",
+  "signOut": "Sign out",
+  "deleteAccount": "Delete account",
+  "permanentlyRemovesData": "Permanently removes your data",
+  "signOutConfirmTitle": "Sign out?",
+  "signOutConfirmMessage": "You can sign back in anytime.",
+  "deleteAccountConfirmTitle": "Delete account?",
+  "deleteAccountConfirmMessage": "This permanently deletes your account and all saved products. This cannot be undone.",
+  "freePlan": "Free plan",
+  "freePlanUsage": "{total} of {limit} items used",
+  "@freePlanUsage": {
+    "placeholders": {
+      "total": { "type": "int" },
+      "limit": { "type": "int" }
+    }
+  },
+  "itemsLeft": "{remaining} left",
+  "@itemsLeft": {
+    "placeholders": {
+      "remaining": { "type": "int" }
+    }
+  },
+  "limitReached": "limit reached",
+  "notificationsEnabled": "Notifications enabled",
+  "notificationsOff": "Notifications are off. Enable them in your device settings.",
+  "exportedItems": "Exported {count} items to clipboard",
+  "@exportedItems": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+  "couldNotOpenLink": "Could not open link",
+  "accountDeleted": "Account deleted",
+  "reSignInToDelete": "Please sign in again, then retry deleting your account.",
+  "couldNotDeleteAccount": "Could not delete account",
+  "signedInWithGoogle": "Signed in with Google",
+  "signedInWithApple": "Signed in with Apple",
+  "guestAccount": "Guest account",
+  "signedIn": "Signed in",
+  "defaultReminders": "Default reminders",
+  "appliedToNewProducts": "Applied to new products you add",
+  "theme": "Theme",
+
+  "scanBarcode": "Scan barcode",
+  "enterManually": "Enter manually",
+  "cameraUnavailable": "Camera unavailable. Check permissions or enter manually.",
+  "lookingUpProduct": "Looking up product…",
+  "pointAtBarcode": "Point at a product barcode",
+
+  "scanExpiryDate": "Scan expiry date",
+  "searchProductByName": "Search product by name",
+  "searchProduct": "Search product",
+  "searchHintExample": "e.g. Maggi ketchup",
+  "typeProductNameHint": "Type a product name and search.",
+  "scanExpiryInstruction": "Point your camera at the printed expiry, \"best before\", or MFG date.",
+  "captureDateLabel": "Capture date label",
+  "reScan": "Re-scan",
+  "pickDateManually": "Pick date manually",
+  "detectedDates": "Detected dates",
+  "detectedDatesPlaceholder": "Detected dates will appear here.",
+  "noDateDetected": "No date detected. Pick the date manually below.",
+  "couldNotCaptureImage": "Could not capture image.",
+
+  "scanNutritionLabel": "Scan nutrition label",
+  "nutritionInstruction": "Point your camera at the nutrition facts table on the package.",
+  "captureNutritionLabel": "Capture nutrition label",
+  "useTheseValues": "Use these values",
+  "detectedNutritionPlaceholder": "Detected nutrition values will appear here.",
+  "detectedValuesPer100g": "Detected values (per 100g)",
+  "calories": "Calories",
+  "protein": "Protein",
+  "fat": "Fat",
+  "carbs": "Carbs",
+  "fiber": "Fiber",
+  "sugar": "Sugar",
+  "couldNotDetectNutrition": "Could not detect nutrition info. Try again with clearer focus on the label.",
+
+  "recipeIdeas": "Recipe ideas",
+  "thinkingOfRecipes": "Thinking of recipes...",
+  "couldNotGenerateRecipes": "Could not generate suggestions right now. Try again later.",
+  "usingProducts": "Using: {products}",
+  "@usingProducts": {
+    "placeholders": {
+      "products": { "type": "String" }
+    }
+  },
+  "ingredients": "Ingredients",
+  "steps": "Steps",
+
+  "confirmDetails": "Confirm details",
+  "productName": "Product name",
+  "productNameHint": "e.g. Amul Butter",
+  "brandOptional": "Brand (optional)",
+  "brandHint": "e.g. Amul",
+  "category": "Category",
+  "storage": "Storage",
+  "quantity": "Quantity",
+  "nutritionPer": "Nutrition (per {per})",
+  "@nutritionPer": {
+    "placeholders": {
+      "per": { "type": "String" }
+    }
+  },
+  "expiryDate": "Expiry date",
+  "remindMe": "Remind me",
+  "saveProduct": "Save product",
+  "pleaseEnterProductName": "Please enter a product name",
+  "productQuantityUpdated": "{name} quantity updated to {qty}.",
+  "@productQuantityUpdated": {
+    "placeholders": {
+      "name": { "type": "String" },
+      "qty": { "type": "int" }
+    }
+  },
+  "productSaved": "{name} saved. Reminders set.",
+  "@productSaved": {
+    "placeholders": {
+      "name": { "type": "String" }
+    }
+  },
+  "notSignedIn": "You are not signed in.",
+
+  "productDetails": "Product details",
+  "editProduct": "Edit product",
+  "saveChanges": "Save changes",
+  "required": "Required",
+  "deleteProductTitle": "Delete product?",
+  "deleteProductMessage": "\"{name}\" and its reminders will be removed permanently.",
+  "@deleteProductMessage": {
+    "placeholders": {
+      "name": { "type": "String" }
+    }
+  },
+  "productUpdated": "Product updated",
+  "couldNotUpdateProduct": "Could not update product",
+  "remindersUpdated": "Reminders updated",
+  "couldNotUpdateReminders": "Could not update reminders",
+  "note": "Note",
+  "noteHint": "e.g. opened, keep in door shelf…",
+  "noteSaved": "Note saved",
+  "couldNotSaveNote": "Could not save note",
+  "noNoteYet": "No note yet.",
+  "markedAsConsumed": "Marked as consumed",
+  "movedBackToInventory": "Moved back to inventory",
+  "couldNotUpdateStatus": "Could not update status",
+  "markAsConsumed": "Mark as consumed",
+  "moveBackToInventory": "Move back to inventory",
+  "nutrition": "Nutrition",
+  "scanLabel": "Scan label",
+  "update": "Update",
+  "noNutritionDataYet": "No nutrition data yet.",
+  "nutritionInfoUpdated": "Nutrition info updated",
+  "couldNotSaveNutritionData": "Could not save nutrition data",
+  "couldNotDetectNutritionShort": "Could not detect nutrition info. Try with clearer focus.",
+  "productDeleted": "Product deleted",
+  "couldNotDeleteProduct": "Could not delete product",
+  "getRecipeIdeas": "Get recipe ideas",
+  "dateSource": "Date source",
+  "sourceOcr": "Scanned (OCR)",
+  "sourceApi": "Product database",
+  "sourceManual": "Entered manually",
+  "manufactured": "Manufactured",
+  "barcode": "Barcode",
+  "nutritionSourceApi": "Product database",
+  "nutritionSourceOcr": "Scanned",
+  "nutritionSourceManual": "Manual",
+  "perSourceLabel": "Per {per} · Source: {source}",
+  "@perSourceLabel": {
+    "placeholders": {
+      "per": { "type": "String" },
+      "source": { "type": "String" }
+    }
+  },
+
+  "cal": "Cal",
+
+  "statusFresh": "Fresh",
+  "statusExpiringSoon": "Expiring soon",
+  "statusExpired": "Expired",
+  "statusConsumed": "Consumed",
+
+  "categoryDairy": "Dairy",
+  "categoryBakery": "Bakery",
+  "categoryProduce": "Produce",
+  "categoryMeat": "Meat & Fish",
+  "categoryBeverages": "Beverages",
+  "categorySnacks": "Snacks",
+  "categoryFrozen": "Frozen",
+  "categoryPantry": "Pantry",
+  "categoryMedicine": "Medicine",
+  "categoryCosmetics": "Cosmetics",
+  "categoryBaby": "Baby",
+  "categoryPetFood": "Pet Food",
+  "categoryOther": "Other",
+
+  "storageFridge": "Fridge",
+  "storageFreezer": "Freezer",
+  "storagePantry": "Pantry",
+  "storageCabinet": "Cabinet",
+  "storageOther": "Other",
+
+  "daysAgo": "{count, plural, =1{1 day ago} other{{count} days ago}}",
+  "@daysAgo": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+  "expiresToday": "Expires today",
+  "expiresTomorrow": "Expires tomorrow",
+  "daysLeft": "{count} days left",
+  "@daysLeft": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+  "onExpiryDay": "On expiry day",
+  "oneDayBefore": "1 day before",
+  "daysBefore": "{count} days before",
+  "@daysBefore": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+
+  "notifExpiresToday": "{name} expires today",
+  "@notifExpiresToday": {
+    "placeholders": {
+      "name": { "type": "String" }
+    }
+  },
+  "notifExpiresSoon": "{name} expires soon",
+  "@notifExpiresSoon": {
+    "placeholders": {
+      "name": { "type": "String" }
+    }
+  },
+  "notifBodyToday": "Please use or discard it safely.",
+  "notifBodySoon": "{name} expires in {count, plural, =1{1 day} other{{count} days}}. Use it soon to avoid waste.",
+  "@notifBodySoon": {
+    "placeholders": {
+      "name": { "type": "String" },
+      "count": { "type": "int" }
+    }
+  },
+
+  "expiryReminders": "Expiry Reminders",
+  "expiryRemindersDesc": "Reminders before your kitchen items expire.",
+
+  "language": "Language"
+}

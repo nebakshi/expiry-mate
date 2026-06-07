@@ -5,6 +5,7 @@ import 'package:image_picker/image_picker.dart';
 
 import '../../../../core/constants/app_constants.dart';
 import '../../../../core/errors/failures.dart';
+import '../../../../core/l10n/l10n.dart';
 import '../../../../shared/models/product_draft.dart';
 import '../../../../shared/widgets/common_widgets.dart';
 import '../../data/nutrition_parser_service.dart';
@@ -49,8 +50,7 @@ class _ScanNutritionScreenState extends ConsumerState<ScanNutritionScreen> {
             _busy = false;
           });
           if (data == null) {
-            showError(context,
-                'Could not detect nutrition info. Try again with clearer focus on the label.');
+            showError(context, context.l10n.couldNotDetectNutrition);
           }
         case Err(:final failure):
           setState(() => _busy = false);
@@ -59,7 +59,7 @@ class _ScanNutritionScreenState extends ConsumerState<ScanNutritionScreen> {
     } catch (_) {
       if (mounted) {
         setState(() => _busy = false);
-        showError(context, 'Could not capture image.');
+        showError(context, context.l10n.couldNotCaptureImage);
       }
     }
   }
@@ -84,7 +84,7 @@ class _ScanNutritionScreenState extends ConsumerState<ScanNutritionScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Scan nutrition label')),
+      appBar: AppBar(title: Text(context.l10n.scanNutritionLabel)),
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.all(AppSpacing.lg),
@@ -104,6 +104,8 @@ class _ScanNutritionScreenState extends ConsumerState<ScanNutritionScreen> {
                           child: Text(
                             '${widget.draft.productName}'
                             '${widget.draft.brand != null ? ' · ${widget.draft.brand}' : ''}',
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
                             style: const TextStyle(
                                 fontWeight: FontWeight.w600),
                           ),
@@ -114,7 +116,7 @@ class _ScanNutritionScreenState extends ConsumerState<ScanNutritionScreen> {
                 ),
               const SizedBox(height: AppSpacing.md),
               Text(
-                'Point your camera at the nutrition facts table on the package.',
+                context.l10n.nutritionInstruction,
                 style: TextStyle(
                     color: Theme.of(context).colorScheme.onSurfaceVariant),
               ),
@@ -123,7 +125,7 @@ class _ScanNutritionScreenState extends ConsumerState<ScanNutritionScreen> {
                 onPressed: _busy ? null : _capture,
                 icon: const Icon(Icons.camera_alt_outlined),
                 label: Text(
-                    _parsed == null ? 'Capture nutrition label' : 'Re-scan'),
+                    _parsed == null ? context.l10n.captureNutritionLabel : context.l10n.reScan),
               ),
               const SizedBox(height: AppSpacing.md),
               if (_busy)
@@ -134,7 +136,7 @@ class _ScanNutritionScreenState extends ConsumerState<ScanNutritionScreen> {
                 Expanded(
                   child: Center(
                     child: Text(
-                      'Detected nutrition values will appear here.',
+                      context.l10n.detectedNutritionPlaceholder,
                       style: TextStyle(
                           color:
                               Theme.of(context).colorScheme.onSurfaceVariant),
@@ -145,12 +147,12 @@ class _ScanNutritionScreenState extends ConsumerState<ScanNutritionScreen> {
               if (_parsed != null)
                 FilledButton(
                   onPressed: _proceed,
-                  child: const Text('Use these values'),
+                  child: Text(context.l10n.useTheseValues),
                 ),
               const SizedBox(height: AppSpacing.sm),
               OutlinedButton(
                 onPressed: _skip,
-                child: const Text('Skip'),
+                child: Text(context.l10n.skip),
               ),
             ],
           ),
@@ -173,21 +175,21 @@ class _NutritionPreview extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text('Detected values (per 100g)',
-                style: TextStyle(fontWeight: FontWeight.w700)),
+            Text(context.l10n.detectedValuesPer100g,
+                style: const TextStyle(fontWeight: FontWeight.w700)),
             const SizedBox(height: AppSpacing.md),
             if (data.calories != null)
-              _row('Calories', '${data.calories!.toStringAsFixed(0)} kcal'),
+              _row(context.l10n.calories, '${data.calories!.toStringAsFixed(0)} kcal'),
             if (data.protein != null)
-              _row('Protein', '${data.protein!.toStringAsFixed(1)} g'),
+              _row(context.l10n.protein, '${data.protein!.toStringAsFixed(1)} g'),
             if (data.fat != null)
-              _row('Fat', '${data.fat!.toStringAsFixed(1)} g'),
+              _row(context.l10n.fat, '${data.fat!.toStringAsFixed(1)} g'),
             if (data.carbs != null)
-              _row('Carbs', '${data.carbs!.toStringAsFixed(1)} g'),
+              _row(context.l10n.carbs, '${data.carbs!.toStringAsFixed(1)} g'),
             if (data.fiber != null)
-              _row('Fiber', '${data.fiber!.toStringAsFixed(1)} g'),
+              _row(context.l10n.fiber, '${data.fiber!.toStringAsFixed(1)} g'),
             if (data.sugar != null)
-              _row('Sugar', '${data.sugar!.toStringAsFixed(1)} g'),
+              _row(context.l10n.sugar, '${data.sugar!.toStringAsFixed(1)} g'),
           ],
         ),
       ),

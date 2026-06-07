@@ -6,6 +6,7 @@ import 'package:image_picker/image_picker.dart';
 import '../../../../core/constants/app_constants.dart';
 import '../../../../core/errors/failures.dart';
 import '../../../../core/extensions/date_extensions.dart';
+import '../../../../core/l10n/l10n.dart';
 import '../../../../core/theme/responsive.dart';
 import '../../../../shared/widgets/common_widgets.dart';
 import '../../../recipes/presentation/recipe_providers.dart';
@@ -52,18 +53,19 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
   Widget build(BuildContext context) {
     final p = _live;
     final status = p.status;
+    final l10n = context.l10n;
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Product details'),
+        title: Text(l10n.productDetails),
         actions: [
           IconButton(
-            tooltip: 'Edit',
+            tooltip: l10n.edit,
             icon: const Icon(Icons.edit_outlined),
             onPressed: _busy ? null : () => _edit(p),
           ),
           IconButton(
-            tooltip: 'Delete',
+            tooltip: l10n.delete,
             icon: const Icon(Icons.delete_outline),
             onPressed: _busy ? null : () => _confirmDelete(p),
           ),
@@ -122,9 +124,9 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
     if (!mounted) return;
     if (ok) {
       setState(() => _product = edited);
-      showSuccess(context, 'Product updated');
+      showSuccess(context, context.l10n.productUpdated);
     } else {
-      showError(context, 'Could not update product');
+      showError(context, context.l10n.couldNotUpdateProduct);
     }
   }
 
@@ -135,9 +137,9 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
     if (!mounted) return;
     if (ok) {
       setState(() => _product = p.copyWith(reminderDaysBefore: days));
-      showSuccess(context, 'Reminders updated');
+      showSuccess(context, context.l10n.remindersUpdated);
     } else {
-      showError(context, 'Could not update reminders');
+      showError(context, context.l10n.couldNotUpdateReminders);
     }
   }
 
@@ -146,23 +148,23 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
     final result = await showDialog<String>(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: const Text('Note'),
+        title: Text(ctx.l10n.note),
         content: TextField(
           controller: controller,
           autofocus: true,
           maxLines: 4,
-          decoration: const InputDecoration(
-            hintText: 'e.g. opened, keep in door shelf…',
+          decoration: InputDecoration(
+            hintText: ctx.l10n.noteHint,
           ),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx),
-            child: const Text('Cancel'),
+            child: Text(ctx.l10n.cancel),
           ),
           FilledButton(
             onPressed: () => Navigator.pop(ctx, controller.text.trim()),
-            child: const Text('Save'),
+            child: Text(ctx.l10n.save),
           ),
         ],
       ),
@@ -177,9 +179,9 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
     if (!mounted) return;
     if (ok) {
       setState(() => _product = p.copyWith(note: result.isEmpty ? null : result));
-      showSuccess(context, 'Note saved');
+      showSuccess(context, context.l10n.noteSaved);
     } else {
-      showError(context, 'Could not save note');
+      showError(context, context.l10n.couldNotSaveNote);
     }
   }
 
@@ -193,10 +195,10 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
       setState(() => _product = p.copyWith(isConsumed: markConsumed));
       showSuccess(
         context,
-        markConsumed ? 'Marked as consumed' : 'Moved back to inventory',
+        markConsumed ? context.l10n.markedAsConsumed : context.l10n.movedBackToInventory,
       );
     } else {
-      showError(context, 'Could not update status');
+      showError(context, context.l10n.couldNotUpdateStatus);
     }
   }
 
@@ -216,8 +218,7 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
       case Success(:final value):
         final data = ref.read(nutritionParserProvider).parse(value);
         if (data == null) {
-          showError(context,
-              'Could not detect nutrition info. Try with clearer focus.');
+          showError(context, context.l10n.couldNotDetectNutritionShort);
           return;
         }
         final updated = p.copyWith(
@@ -235,9 +236,9 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
         if (!mounted) return;
         if (ok) {
           setState(() => _product = updated);
-          showSuccess(context, 'Nutrition info updated');
+          showSuccess(context, context.l10n.nutritionInfoUpdated);
         } else {
-          showError(context, 'Could not save nutrition data');
+          showError(context, context.l10n.couldNotSaveNutritionData);
         }
       case Err(:final failure):
         showError(context, failure.message);
@@ -248,19 +249,19 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: const Text('Delete product?'),
+        title: Text(ctx.l10n.deleteProductTitle),
         content: Text(
-          '“${p.productName}” and its reminders will be removed permanently.',
+          ctx.l10n.deleteProductMessage(p.productName),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx, false),
-            child: const Text('Cancel'),
+            child: Text(ctx.l10n.cancel),
           ),
           FilledButton(
             style: FilledButton.styleFrom(backgroundColor: AppColors.expired),
             onPressed: () => Navigator.pop(ctx, true),
-            child: const Text('Delete'),
+            child: Text(ctx.l10n.delete),
           ),
         ],
       ),
@@ -269,10 +270,10 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
     final ok = await ref.read(productControllerProvider.notifier).delete(p);
     if (!mounted) return;
     if (ok) {
-      showSuccess(context, 'Product deleted');
+      showSuccess(context, context.l10n.productDeleted);
       context.pop();
     } else {
-      showError(context, 'Could not delete product');
+      showError(context, context.l10n.couldNotDeleteProduct);
     }
   }
 }
@@ -373,37 +374,41 @@ class _DetailsCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final muted = Theme.of(context).colorScheme.onSurfaceVariant;
+    final l10n = context.l10n;
     return _Card(
       child: Column(
         children: [
-          _row(Icons.category_outlined, 'Category', product.category.label, muted),
+          _row(Icons.category_outlined, l10n.category, product.category.label, muted),
           _divider(),
-          _row(Icons.place_outlined, 'Storage', product.storageLocation.label, muted),
+          _row(Icons.place_outlined, l10n.storage, product.storageLocation.label, muted),
           _divider(),
-          _row(Icons.numbers_outlined, 'Quantity',
+          _row(Icons.numbers_outlined, l10n.quantity,
               '${product.quantity} ${product.unit}', muted),
           if (product.manufacturingDate != null) ...[
             _divider(),
-            _row(Icons.precision_manufacturing_outlined, 'Manufactured',
+            _row(Icons.precision_manufacturing_outlined, l10n.manufactured,
                 product.manufacturingDate!.displayDate, muted),
           ],
           if (product.barcode != null && product.barcode!.isNotEmpty) ...[
             _divider(),
-            _row(Icons.qr_code_2_outlined, 'Barcode', product.barcode!, muted),
+            _row(Icons.qr_code_2_outlined, l10n.barcode, product.barcode!, muted),
           ],
           _divider(),
-          _row(Icons.fact_check_outlined, 'Date source',
-              _sourceLabel(product.parsedBy), muted),
+          _row(Icons.fact_check_outlined, l10n.dateSource,
+              _sourceLabel(context, product.parsedBy), muted),
         ],
       ),
     );
   }
 
-  String _sourceLabel(String parsedBy) => switch (parsedBy.toUpperCase()) {
-        'OCR' => 'Scanned (OCR)',
-        'API' => 'Product database',
-        _ => 'Entered manually',
-      };
+  String _sourceLabel(BuildContext context, String parsedBy) {
+    final l10n = context.l10n;
+    return switch (parsedBy.toUpperCase()) {
+      'OCR' => l10n.sourceOcr,
+      'API' => l10n.sourceApi,
+      _ => l10n.sourceManual,
+    };
+  }
 
   Widget _divider() => const Divider(height: AppSpacing.lg);
 
@@ -412,12 +417,16 @@ class _DetailsCard extends StatelessWidget {
       children: [
         Icon(icon, size: 20, color: mutedColor),
         const SizedBox(width: AppSpacing.md),
-        Text(label, style: TextStyle(color: mutedColor)),
-        const Spacer(),
+        Flexible(
+          child: Text(label, maxLines: 1, overflow: TextOverflow.ellipsis, style: TextStyle(color: mutedColor)),
+        ),
+        const SizedBox(width: AppSpacing.sm),
         Flexible(
           child: Text(
             value,
             textAlign: TextAlign.right,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
             style: const TextStyle(fontWeight: FontWeight.w600),
           ),
         ),
@@ -441,12 +450,13 @@ class _RemindersCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
     return _Card(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text('Reminders',
-              style: TextStyle(fontWeight: FontWeight.w700, fontSize: 16)),
+          Text(l10n.reminders,
+              style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 16)),
           const SizedBox(height: AppSpacing.sm),
           Opacity(
             opacity: enabled ? 1 : 0.5,
@@ -496,6 +506,7 @@ class _NoteCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final hasNote = note != null && note!.isNotEmpty;
     final colors = Theme.of(context).colorScheme;
+    final l10n = context.l10n;
     return _Card(
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -507,11 +518,11 @@ class _NoteCard extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text('Note',
-                    style: TextStyle(fontWeight: FontWeight.w700)),
+                Text(l10n.note,
+                    style: const TextStyle(fontWeight: FontWeight.w700)),
                 const SizedBox(height: 4),
                 Text(
-                  hasNote ? note! : 'No note yet.',
+                  hasNote ? note! : l10n.noNoteYet,
                   style: TextStyle(
                     color: hasNote
                         ? colors.onSurface
@@ -523,7 +534,7 @@ class _NoteCard extends StatelessWidget {
           ),
           TextButton(
             onPressed: enabled ? onEdit : null,
-            child: Text(hasNote ? 'Edit' : 'Add'),
+            child: Text(hasNote ? l10n.edit : l10n.add),
           ),
         ],
       ),
@@ -546,7 +557,7 @@ class _RecipeButton extends ConsumerWidget {
       child: OutlinedButton.icon(
         onPressed: () => context.push('/recipes', extra: [productName]),
         icon: const Icon(Icons.restaurant_outlined, size: 18),
-        label: const Text('Get recipe ideas'),
+        label: Text(context.l10n.getRecipeIdeas),
       ),
     );
   }
@@ -567,6 +578,7 @@ class _NutritionCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final hasData = product.hasNutrition;
     final colors = Theme.of(context).colorScheme;
+    final l10n = context.l10n;
 
     return _Card(
       child: Column(
@@ -577,16 +589,16 @@ class _NutritionCard extends StatelessWidget {
               Icon(Icons.local_fire_department_outlined,
                   size: 20, color: colors.onSurfaceVariant),
               const SizedBox(width: AppSpacing.sm),
-              const Expanded(
-                child: Text('Nutrition',
+              Expanded(
+                child: Text(l10n.nutrition,
                     style:
-                        TextStyle(fontWeight: FontWeight.w700, fontSize: 16)),
+                        const TextStyle(fontWeight: FontWeight.w700, fontSize: 16)),
               ),
               TextButton.icon(
                 onPressed: enabled ? onScan : null,
                 icon: Icon(hasData ? Icons.refresh : Icons.camera_alt_outlined,
                     size: 16),
-                label: Text(hasData ? 'Update' : 'Scan label'),
+                label: Text(hasData ? l10n.update : l10n.scanLabel),
               ),
             ],
           ),
@@ -595,18 +607,21 @@ class _NutritionCard extends StatelessWidget {
               Padding(
                 padding: const EdgeInsets.only(bottom: AppSpacing.sm),
                 child: Text(
-                  'Per ${product.nutritionPer} · Source: ${_sourceLabel(product.nutritionSource!)}',
+                  l10n.perSourceLabel(
+                    product.nutritionPer,
+                    _sourceLabel(context, product.nutritionSource!),
+                  ),
                   style: TextStyle(fontSize: 12, color: colors.onSurfaceVariant),
                 ),
               ),
             _NutritionRow(
               items: [
                 if (product.calories != null)
-                  _NutrientItem('Calories', '${product.calories!.toStringAsFixed(0)}', 'kcal'),
+                  _NutrientItem(l10n.calories, '${product.calories!.toStringAsFixed(0)}', 'kcal'),
                 if (product.protein != null)
-                  _NutrientItem('Protein', product.protein!.toStringAsFixed(1), 'g'),
+                  _NutrientItem(l10n.protein, product.protein!.toStringAsFixed(1), 'g'),
                 if (product.fat != null)
-                  _NutrientItem('Fat', product.fat!.toStringAsFixed(1), 'g'),
+                  _NutrientItem(l10n.fat, product.fat!.toStringAsFixed(1), 'g'),
               ],
             ),
             if (product.carbs != null || product.fiber != null || product.sugar != null) ...[
@@ -614,11 +629,11 @@ class _NutritionCard extends StatelessWidget {
               _NutritionRow(
                 items: [
                   if (product.carbs != null)
-                    _NutrientItem('Carbs', product.carbs!.toStringAsFixed(1), 'g'),
+                    _NutrientItem(l10n.carbs, product.carbs!.toStringAsFixed(1), 'g'),
                   if (product.fiber != null)
-                    _NutrientItem('Fiber', product.fiber!.toStringAsFixed(1), 'g'),
+                    _NutrientItem(l10n.fiber, product.fiber!.toStringAsFixed(1), 'g'),
                   if (product.sugar != null)
-                    _NutrientItem('Sugar', product.sugar!.toStringAsFixed(1), 'g'),
+                    _NutrientItem(l10n.sugar, product.sugar!.toStringAsFixed(1), 'g'),
                 ],
               ),
             ],
@@ -626,7 +641,7 @@ class _NutritionCard extends StatelessWidget {
             Padding(
               padding: const EdgeInsets.only(top: AppSpacing.sm),
               child: Text(
-                'No nutrition data yet.',
+                l10n.noNutritionDataYet,
                 style: TextStyle(color: colors.onSurfaceVariant),
               ),
             ),
@@ -635,11 +650,14 @@ class _NutritionCard extends StatelessWidget {
     );
   }
 
-  String _sourceLabel(String source) => switch (source.toUpperCase()) {
-        'API' => 'Product database',
-        'OCR' => 'Scanned',
-        _ => 'Manual',
-      };
+  String _sourceLabel(BuildContext context, String source) {
+    final l10n = context.l10n;
+    return switch (source.toUpperCase()) {
+      'API' => l10n.nutritionSourceApi,
+      'OCR' => l10n.nutritionSourceOcr,
+      _ => l10n.nutritionSourceManual,
+    };
+  }
 }
 
 class _NutrientItem {
@@ -662,12 +680,16 @@ class _NutritionRow extends StatelessWidget {
                   children: [
                     Text(
                       '${item.value}${item.unit}',
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
                       style: const TextStyle(
                           fontSize: 18, fontWeight: FontWeight.w800),
                     ),
                     const SizedBox(height: 2),
                     Text(
                       item.label,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
                       style: TextStyle(
                         fontSize: 12,
                         color: Theme.of(context).colorScheme.onSurfaceVariant,
@@ -694,6 +716,7 @@ class _ConsumeButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
     return SizedBox(
       width: double.infinity,
       child: FilledButton.icon(
@@ -702,7 +725,7 @@ class _ConsumeButton extends StatelessWidget {
             ? Icons.undo_rounded
             : Icons.check_circle_outline_rounded),
         label: Text(
-          isConsumed ? 'Move back to inventory' : 'Mark as consumed',
+          isConsumed ? l10n.moveBackToInventory : l10n.markAsConsumed,
           style: TextStyle(fontSize: Responsive.fontSize(14)),
         ),
         style: FilledButton.styleFrom(
@@ -801,6 +824,7 @@ class _EditSheetState extends State<_EditSheet> {
   @override
   Widget build(BuildContext context) {
     final bottom = MediaQuery.of(context).viewInsets.bottom;
+    final l10n = context.l10n;
     return Padding(
       padding: EdgeInsets.fromLTRB(
           AppSpacing.lg, 0, AppSpacing.lg, AppSpacing.lg + bottom),
@@ -810,26 +834,26 @@ class _EditSheetState extends State<_EditSheet> {
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text('Edit product',
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.w800)),
+            Text(l10n.editProduct,
+                style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w800)),
             const SizedBox(height: AppSpacing.lg),
             TextFormField(
               controller: _name,
               textCapitalization: TextCapitalization.words,
-              decoration: const InputDecoration(
-                labelText: 'Product name',
-                border: OutlineInputBorder(),
+              decoration: InputDecoration(
+                labelText: l10n.productName,
+                border: const OutlineInputBorder(),
               ),
               validator: (v) =>
-                  (v == null || v.trim().isEmpty) ? 'Required' : null,
+                  (v == null || v.trim().isEmpty) ? l10n.required : null,
             ),
             const SizedBox(height: AppSpacing.md),
             TextFormField(
               controller: _brand,
               textCapitalization: TextCapitalization.words,
-              decoration: const InputDecoration(
-                labelText: 'Brand (optional)',
-                border: OutlineInputBorder(),
+              decoration: InputDecoration(
+                labelText: l10n.brandOptional,
+                border: const OutlineInputBorder(),
               ),
             ),
             const SizedBox(height: AppSpacing.md),
@@ -839,9 +863,9 @@ class _EditSheetState extends State<_EditSheet> {
                   child: DropdownButtonFormField<ProductCategory>(
                     initialValue: _category,
                     isExpanded: true,
-                    decoration: const InputDecoration(
-                      labelText: 'Category',
-                      border: OutlineInputBorder(),
+                    decoration: InputDecoration(
+                      labelText: l10n.category,
+                      border: const OutlineInputBorder(),
                     ),
                     items: ProductCategory.values
                         .map((c) => DropdownMenuItem(
@@ -858,9 +882,9 @@ class _EditSheetState extends State<_EditSheet> {
                   child: DropdownButtonFormField<StorageLocation>(
                     initialValue: _storage,
                     isExpanded: true,
-                    decoration: const InputDecoration(
-                      labelText: 'Storage',
-                      border: OutlineInputBorder(),
+                    decoration: InputDecoration(
+                      labelText: l10n.storage,
+                      border: const OutlineInputBorder(),
                     ),
                     items: StorageLocation.values
                         .map((s) => DropdownMenuItem(
@@ -880,9 +904,9 @@ class _EditSheetState extends State<_EditSheet> {
                   child: TextFormField(
                     controller: _quantity,
                     keyboardType: TextInputType.number,
-                    decoration: const InputDecoration(
-                      labelText: 'Quantity',
-                      border: OutlineInputBorder(),
+                    decoration: InputDecoration(
+                      labelText: l10n.quantity,
+                      border: const OutlineInputBorder(),
                     ),
                   ),
                 ),
@@ -891,9 +915,9 @@ class _EditSheetState extends State<_EditSheet> {
                   child: InkWell(
                     onTap: _pickExpiry,
                     child: InputDecorator(
-                      decoration: const InputDecoration(
-                        labelText: 'Expiry date',
-                        border: OutlineInputBorder(),
+                      decoration: InputDecoration(
+                        labelText: l10n.expiryDate,
+                        border: const OutlineInputBorder(),
                       ),
                       child: Text(_expiry.displayDate),
                     ),
@@ -909,7 +933,7 @@ class _EditSheetState extends State<_EditSheet> {
                 style: FilledButton.styleFrom(
                   padding: const EdgeInsets.symmetric(vertical: 14),
                 ),
-                child: const Text('Save changes'),
+                child: Text(l10n.saveChanges),
               ),
             ),
           ],

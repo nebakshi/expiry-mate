@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../../core/constants/app_constants.dart';
+import '../../../../core/l10n/l10n.dart';
 import '../../../../core/theme/responsive.dart';
 import '../../../auth/presentation/providers/auth_providers.dart';
 import '../../../product/domain/entities/product.dart';
@@ -24,7 +25,7 @@ class HomeScreen extends ConsumerWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text('Hi${user?.name != null ? ', ${user!.name!.split(' ').first}' : ''} 👋'),
+        title: Text(context.l10n.homeGreeting(user?.name != null ? ', ${user!.name!.split(' ').first}' : '')),
         actions: [
           IconButton(
             icon: const Icon(Icons.settings_outlined),
@@ -37,7 +38,7 @@ class HomeScreen extends ConsumerWidget {
         backgroundColor: AppColors.primary,
         foregroundColor: Colors.white,
         icon: const Icon(Icons.qr_code_scanner_rounded),
-        label: const Text('Scan'),
+        label: Text(context.l10n.scan),
       ),
       body: SafeArea(
         child: Column(
@@ -90,19 +91,19 @@ class _SummaryHeader extends StatelessWidget {
       child: Row(
         children: [
           _StatTile(
-              label: 'Tracked',
+              label: context.l10n.tracked,
               value: total,
               color: AppColors.primary,
               icon: Icons.inventory_2_outlined),
           const SizedBox(width: AppSpacing.sm),
           _StatTile(
-              label: 'Expiring',
+              label: context.l10n.expiring,
               value: expiringSoon,
               color: AppColors.expiringSoon,
               icon: Icons.timelapse_outlined),
           const SizedBox(width: AppSpacing.sm),
           _StatTile(
-              label: 'Expired',
+              label: context.l10n.expired,
               value: expired,
               color: AppColors.expired,
               icon: Icons.warning_amber_rounded),
@@ -169,9 +170,9 @@ class _SearchBar extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md),
       child: TextField(
         onChanged: onChanged,
-        decoration: const InputDecoration(
-          hintText: 'Search products or brands',
-          prefixIcon: Icon(Icons.search),
+        decoration: InputDecoration(
+          hintText: context.l10n.searchHint,
+          prefixIcon: const Icon(Icons.search),
         ),
       ),
     );
@@ -183,11 +184,11 @@ class _FilterChips extends StatelessWidget {
   final InventoryFilter selected;
   final ValueChanged<InventoryFilter> onSelected;
 
-  static const _labels = {
-    InventoryFilter.all: 'All',
-    InventoryFilter.fresh: 'Fresh',
-    InventoryFilter.expiringSoon: 'Expiring soon',
-    InventoryFilter.expired: 'Expired',
+  Map<InventoryFilter, String> _labels(BuildContext context) => {
+    InventoryFilter.all: context.l10n.filterAll,
+    InventoryFilter.fresh: context.l10n.filterFresh,
+    InventoryFilter.expiringSoon: context.l10n.filterExpiringSoon,
+    InventoryFilter.expired: context.l10n.filterExpired,
   };
 
   @override
@@ -206,7 +207,7 @@ class _FilterChips extends StatelessWidget {
           return Padding(
             padding: const EdgeInsets.only(right: AppSpacing.sm),
             child: ChoiceChip(
-              label: Text(_labels[f]!),
+              label: Text(_labels(context)[f]!),
               selected: isSel,
               onSelected: (_) => onSelected(f),
               selectedColor: AppColors.primary.withValues(alpha: isDark ? 0.25 : 0.15),
@@ -249,7 +250,7 @@ class _RecipeBannerCard extends StatelessWidget {
               const SizedBox(width: AppSpacing.sm),
               Expanded(
                 child: Text(
-                  '$count item${count > 1 ? 's' : ''} expiring — get recipe ideas',
+                  context.l10n.recipeBanner(count),
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,
                   style: TextStyle(
@@ -275,13 +276,12 @@ class _InventoryList extends ConsumerWidget {
     if (products.isEmpty) {
       return EmptyState(
         icon: Icons.kitchen_outlined,
-        title: 'Your kitchen is empty',
-        message:
-            'Scan your first product to start tracking expiry dates and get timely reminders.',
+        title: context.l10n.emptyKitchenTitle,
+        message: context.l10n.emptyKitchenMessage,
         action: FilledButton.icon(
           onPressed: () => context.push('/scan-barcode'),
           icon: const Icon(Icons.qr_code_scanner_rounded),
-          label: const Text('Scan a product'),
+          label: Text(context.l10n.scanAProduct),
         ),
       );
     }

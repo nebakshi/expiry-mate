@@ -1,4 +1,5 @@
 import 'package:intl/intl.dart';
+import '../../l10n/app_localizations.dart';
 import '../constants/app_constants.dart';
 
 extension DateTimeX on DateTime {
@@ -30,6 +31,24 @@ extension IntReminderX on int {
     if (this == 0) return 'On expiry day';
     if (this == 1) return '1 day before';
     return '$this days before';
+  }
+}
+
+extension DateTimeLocalizedX on DateTime {
+  String localizedDaysLeftLabel(AppLocalizations l10n) {
+    final d = daysFromToday;
+    if (d < 0) return l10n.daysAgo(-d);
+    if (d == 0) return l10n.expiresToday;
+    if (d == 1) return l10n.expiresTomorrow;
+    return l10n.daysLeft(d);
+  }
+}
+
+extension IntReminderLocalizedX on int {
+  String localizedReminderLabel(AppLocalizations l10n) {
+    if (this == 0) return l10n.onExpiryDay;
+    if (this == 1) return l10n.oneDayBefore;
+    return l10n.daysBefore(this);
   }
 }
 

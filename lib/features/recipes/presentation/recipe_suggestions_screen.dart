@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/constants/app_constants.dart';
+import '../../../core/l10n/l10n.dart';
 import '../../../shared/widgets/common_widgets.dart';
 import '../data/recipe_service.dart';
 import 'recipe_providers.dart';
@@ -54,20 +55,20 @@ class _RecipeSuggestionsScreenState
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Recipe ideas')),
+      appBar: AppBar(title: Text(context.l10n.recipeIdeas)),
       body: _buildBody(),
     );
   }
 
   Widget _buildBody() {
     if (_loading) {
-      return const Center(
+      return Center(
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            CircularProgressIndicator(),
-            SizedBox(height: AppSpacing.md),
-            Text('Thinking of recipes...'),
+            const CircularProgressIndicator(),
+            const SizedBox(height: AppSpacing.md),
+            Text(context.l10n.thinkingOfRecipes),
           ],
         ),
       );
@@ -84,12 +85,12 @@ class _RecipeSuggestionsScreenState
                   size: 48,
                   color: Theme.of(context).colorScheme.onSurfaceVariant),
               const SizedBox(height: AppSpacing.md),
-              Text(_error!,
+              Text(context.l10n.couldNotGenerateRecipes,
                   textAlign: TextAlign.center,
                   style: TextStyle(
                       color: Theme.of(context).colorScheme.onSurfaceVariant)),
               const SizedBox(height: AppSpacing.md),
-              FilledButton(onPressed: _loadRecipes, child: const Text('Retry')),
+              FilledButton(onPressed: _loadRecipes, child: Text(context.l10n.retry)),
             ],
           ),
         ),
@@ -100,7 +101,7 @@ class _RecipeSuggestionsScreenState
       padding: const EdgeInsets.all(AppSpacing.lg),
       children: [
         Text(
-          'Using: ${widget.productNames.join(", ")}',
+          context.l10n.usingProducts(widget.productNames.join(", ")),
           style: TextStyle(
             color: Theme.of(context).colorScheme.onSurfaceVariant,
             fontSize: 13,
@@ -167,8 +168,8 @@ class _RecipeCardState extends State<_RecipeCard> {
                       fontSize: 13)),
               if (_expanded) ...[
                 const SizedBox(height: AppSpacing.md),
-                const Text('Ingredients',
-                    style:
+                Text(context.l10n.ingredients,
+                    style: const
                         TextStyle(fontWeight: FontWeight.w600, fontSize: 14)),
                 const SizedBox(height: 4),
                 ...r.ingredients.map((i) => Padding(
@@ -184,8 +185,8 @@ class _RecipeCardState extends State<_RecipeCard> {
                       ),
                     )),
                 const SizedBox(height: AppSpacing.md),
-                const Text('Steps',
-                    style:
+                Text(context.l10n.steps,
+                    style: const
                         TextStyle(fontWeight: FontWeight.w600, fontSize: 14)),
                 const SizedBox(height: 4),
                 ...r.steps.asMap().entries.map((e) => Padding(

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../../../core/constants/app_constants.dart';
+import '../../../../l10n/app_localizations.dart';
 
 /// PLAN §9 — Product status.
 enum ProductStatus {
@@ -21,6 +22,13 @@ enum ProductStatus {
         ProductStatus.expiringSoon => 'Expiring soon',
         ProductStatus.expired => 'Expired',
         ProductStatus.consumed => 'Consumed',
+      };
+
+  String localizedLabel(AppLocalizations l10n) => switch (this) {
+        ProductStatus.fresh => l10n.statusFresh,
+        ProductStatus.expiringSoon => l10n.statusExpiringSoon,
+        ProductStatus.expired => l10n.statusExpired,
+        ProductStatus.consumed => l10n.statusConsumed,
       };
 
   Color get color => switch (this) {
@@ -73,6 +81,22 @@ enum ProductCategory {
         ProductCategory.other => 'Other',
       };
 
+  String localizedLabel(AppLocalizations l10n) => switch (this) {
+        ProductCategory.dairy => l10n.categoryDairy,
+        ProductCategory.bakery => l10n.categoryBakery,
+        ProductCategory.produce => l10n.categoryProduce,
+        ProductCategory.meat => l10n.categoryMeat,
+        ProductCategory.beverages => l10n.categoryBeverages,
+        ProductCategory.snacks => l10n.categorySnacks,
+        ProductCategory.frozen => l10n.categoryFrozen,
+        ProductCategory.pantry => l10n.categoryPantry,
+        ProductCategory.medicine => l10n.categoryMedicine,
+        ProductCategory.cosmetics => l10n.categoryCosmetics,
+        ProductCategory.baby => l10n.categoryBaby,
+        ProductCategory.petFood => l10n.categoryPetFood,
+        ProductCategory.other => l10n.categoryOther,
+      };
+
   IconData get icon => switch (this) {
         ProductCategory.dairy => Icons.egg_alt_outlined,
         ProductCategory.bakery => Icons.bakery_dining_outlined,
@@ -112,5 +136,13 @@ enum StorageLocation {
         StorageLocation.pantry => 'Pantry',
         StorageLocation.cabinet => 'Cabinet',
         StorageLocation.other => 'Other',
+      };
+
+  String localizedLabel(AppLocalizations l10n) => switch (this) {
+        StorageLocation.fridge => l10n.storageFridge,
+        StorageLocation.freezer => l10n.storageFreezer,
+        StorageLocation.pantry => l10n.storagePantry,
+        StorageLocation.cabinet => l10n.storageCabinet,
+        StorageLocation.other => l10n.storageOther,
       };
 }

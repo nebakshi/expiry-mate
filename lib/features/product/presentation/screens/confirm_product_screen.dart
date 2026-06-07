@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import '../../../../core/constants/app_constants.dart';
 import '../../../../core/errors/failures.dart';
 import '../../../../core/extensions/date_extensions.dart';
+import '../../../../core/l10n/l10n.dart';
 import '../../../../core/theme/responsive.dart';
 import '../../../../shared/models/product_draft.dart';
 import '../../../../shared/widgets/common_widgets.dart';
@@ -68,7 +69,7 @@ class _ConfirmProductScreenState extends ConsumerState<ConfirmProductScreen> {
     if (!_formKey.currentState!.validate()) return;
     final user = ref.read(currentUserProvider);
     if (user == null) {
-      showError(context, 'You are not signed in.');
+      showError(context, context.l10n.notSignedIn);
       return;
     }
     final now = DateTime.now();
@@ -103,8 +104,8 @@ class _ConfirmProductScreenState extends ConsumerState<ConfirmProductScreen> {
     if (!mounted) return;
     if (saved != null) {
       final msg = saved.quantity > product.quantity
-          ? '${saved.productName} quantity updated to ${saved.quantity}.'
-          : '${saved.productName} saved. Reminders set.';
+          ? context.l10n.productQuantityUpdated(saved.productName, saved.quantity)
+          : context.l10n.productSaved(saved.productName);
       showSuccess(context, msg);
       context.go('/home');
     } else {
@@ -118,31 +119,32 @@ class _ConfirmProductScreenState extends ConsumerState<ConfirmProductScreen> {
   @override
   Widget build(BuildContext context) {
     final saving = ref.watch(productControllerProvider).isLoading;
+    final l10n = context.l10n;
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Confirm details')),
+      appBar: AppBar(title: Text(l10n.confirmDetails)),
       body: SafeArea(
         child: Form(
           key: _formKey,
           child: ListView(
             padding: const EdgeInsets.all(AppSpacing.lg),
             children: [
-              _label('Product name'),
+              _label(l10n.productName),
               TextFormField(
                 controller: _name,
                 textCapitalization: TextCapitalization.words,
-                decoration: const InputDecoration(
-                    hintText: 'e.g. Amul Butter'),
+                decoration: InputDecoration(
+                    hintText: l10n.productNameHint),
                 validator: (v) => (v == null || v.trim().isEmpty)
-                    ? 'Please enter a product name'
+                    ? l10n.pleaseEnterProductName
                     : null,
               ),
               const SizedBox(height: AppSpacing.md),
-              _label('Brand (optional)'),
+              _label(l10n.brandOptional),
               TextFormField(
                 controller: _brand,
                 textCapitalization: TextCapitalization.words,
-                decoration: const InputDecoration(hintText: 'e.g. Amul'),
+                decoration: InputDecoration(hintText: l10n.brandHint),
               ),
               const SizedBox(height: AppSpacing.md),
               Row(
@@ -152,7 +154,7 @@ class _ConfirmProductScreenState extends ConsumerState<ConfirmProductScreen> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        _label('Category'),
+                        _label(l10n.category),
                         DropdownButtonFormField<ProductCategory>(
                           value: _category,
                           isExpanded: true,
@@ -161,7 +163,7 @@ class _ConfirmProductScreenState extends ConsumerState<ConfirmProductScreen> {
                           items: ProductCategory.values
                               .map((c) => DropdownMenuItem(
                                     value: c,
-                                    child: Text(c.label),
+                                    child: Text(c.label, overflow: TextOverflow.ellipsis),
                                   ))
                               .toList(),
                           onChanged: (v) =>
@@ -175,7 +177,7 @@ class _ConfirmProductScreenState extends ConsumerState<ConfirmProductScreen> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        _label('Storage'),
+                        _label(l10n.storage),
                         DropdownButtonFormField<StorageLocation>(
                           value: _storage,
                           isExpanded: true,
@@ -184,7 +186,7 @@ class _ConfirmProductScreenState extends ConsumerState<ConfirmProductScreen> {
                           items: StorageLocation.values
                               .map((s) => DropdownMenuItem(
                                     value: s,
-                                    child: Text(s.label),
+                                    child: Text(s.label, overflow: TextOverflow.ellipsis),
                                   ))
                               .toList(),
                           onChanged: (v) =>
@@ -196,7 +198,7 @@ class _ConfirmProductScreenState extends ConsumerState<ConfirmProductScreen> {
                 ],
               ),
               const SizedBox(height: AppSpacing.md),
-              _label('Quantity'),
+              _label(l10n.quantity),
               TextFormField(
                 controller: _quantity,
                 keyboardType: TextInputType.number,
@@ -204,7 +206,7 @@ class _ConfirmProductScreenState extends ConsumerState<ConfirmProductScreen> {
               ),
               if (widget.draft.hasNutrition) ...[
                 const SizedBox(height: AppSpacing.md),
-                _label('Nutrition (per ${widget.draft.nutritionPer})'),
+                _label(l10n.nutritionPer(widget.draft.nutritionPer)),
                 Card(
                   child: Padding(
                     padding: const EdgeInsets.all(AppSpacing.md),
@@ -212,18 +214,18 @@ class _ConfirmProductScreenState extends ConsumerState<ConfirmProductScreen> {
                       mainAxisAlignment: MainAxisAlignment.spaceAround,
                       children: [
                         if (widget.draft.calories != null)
-                          _nutrientChip('${widget.draft.calories!.toStringAsFixed(0)} kcal', 'Cal'),
+                          _nutrientChip('${widget.draft.calories!.toStringAsFixed(0)} kcal', l10n.cal),
                         if (widget.draft.protein != null)
-                          _nutrientChip('${widget.draft.protein!.toStringAsFixed(1)}g', 'Protein'),
+                          _nutrientChip('${widget.draft.protein!.toStringAsFixed(1)}g', l10n.protein),
                         if (widget.draft.fat != null)
-                          _nutrientChip('${widget.draft.fat!.toStringAsFixed(1)}g', 'Fat'),
+                          _nutrientChip('${widget.draft.fat!.toStringAsFixed(1)}g', l10n.fat),
                       ],
                     ),
                   ),
                 ),
               ],
               const SizedBox(height: AppSpacing.md),
-              _label('Expiry date'),
+              _label(l10n.expiryDate),
               InkWell(
                 onTap: _pickExpiry,
                 borderRadius: BorderRadius.circular(12),
@@ -238,7 +240,7 @@ class _ConfirmProductScreenState extends ConsumerState<ConfirmProductScreen> {
                 ),
               ),
               const SizedBox(height: AppSpacing.lg),
-              _label('Remind me'),
+              _label(l10n.remindMe),
               _ReminderSelector(
                 selected: _reminders,
                 onChanged: (r) => setState(() => _reminders = r),
@@ -252,7 +254,7 @@ class _ConfirmProductScreenState extends ConsumerState<ConfirmProductScreen> {
                         width: 20,
                         child: CircularProgressIndicator(
                             strokeWidth: 2, color: Colors.white))
-                    : const Text('Save product'),
+                    : Text(l10n.saveProduct),
               ),
             ],
           ),
@@ -272,10 +274,14 @@ class _ConfirmProductScreenState extends ConsumerState<ConfirmProductScreen> {
         mainAxisSize: MainAxisSize.min,
         children: [
           Text(value,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
               style:
                   const TextStyle(fontWeight: FontWeight.w700, fontSize: 15)),
           const SizedBox(height: 2),
           Text(label,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
               style: TextStyle(
                   fontSize: 11,
                   color: Theme.of(context).colorScheme.onSurfaceVariant)),

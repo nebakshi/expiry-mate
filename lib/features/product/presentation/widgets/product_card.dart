@@ -54,7 +54,7 @@ class ProductCard extends StatelessWidget {
                     SizedBox(height: isSmall ? 4 : AppSpacing.sm),
                     Row(
                       children: [
-                        StatusBadge(product.status),
+                        Flexible(child: StatusBadge(product.status)),
                         if (!isSmall) ...[
                           const SizedBox(width: AppSpacing.sm),
                           Icon(product.category.icon,
@@ -87,25 +87,32 @@ class ProductCard extends StatelessWidget {
                 ),
               ),
               SizedBox(width: isSmall ? 4 : AppSpacing.sm),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.end,
-                children: [
-                  Text(
-                    product.expiryDate.displayDate,
-                    style: TextStyle(
-                        fontSize: Responsive.fontSize(11),
-                        color: Theme.of(context).colorScheme.onSurfaceVariant),
-                  ),
-                  const SizedBox(height: 4),
-                  Text(
-                    product.expiryDate.daysLeftLabel,
-                    style: TextStyle(
-                      fontSize: Responsive.fontSize(12),
-                      fontWeight: FontWeight.w700,
-                      color: product.status.color,
+              ConstrainedBox(
+                constraints: BoxConstraints(maxWidth: isSmall ? 90 : 110),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  children: [
+                    Text(
+                      product.expiryDate.displayDate,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(
+                          fontSize: Responsive.fontSize(11),
+                          color: Theme.of(context).colorScheme.onSurfaceVariant),
                     ),
-                  ),
-                ],
+                    const SizedBox(height: 4),
+                    Text(
+                      product.expiryDate.daysLeftLabel,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(
+                        fontSize: Responsive.fontSize(12),
+                        fontWeight: FontWeight.w700,
+                        color: product.status.color,
+                      ),
+                    ),
+                  ],
+                ),
               ),
             ],
           ),

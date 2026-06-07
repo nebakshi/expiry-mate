@@ -6,6 +6,7 @@ import 'package:image_picker/image_picker.dart';
 import '../../../../core/constants/app_constants.dart';
 import '../../../../core/errors/failures.dart';
 import '../../../../core/extensions/date_extensions.dart';
+import '../../../../core/l10n/l10n.dart';
 import '../../../../shared/models/product_draft.dart';
 import '../../../../shared/widgets/common_widgets.dart';
 import '../../../expiry_parser/domain/expiry_date_candidate.dart';
@@ -52,8 +53,7 @@ class _ScanExpiryScreenState extends ConsumerState<ScanExpiryScreen> {
             _busy = false;
           });
           if (candidates.isEmpty) {
-            showError(context,
-                'No date detected. Pick the date manually below.');
+            showError(context, context.l10n.noDateDetected);
           }
         case Err(:final failure):
           setState(() => _busy = false);
@@ -62,7 +62,7 @@ class _ScanExpiryScreenState extends ConsumerState<ScanExpiryScreen> {
     } catch (_) {
       if (mounted) {
         setState(() => _busy = false);
-        showError(context, 'Could not capture image.');
+        showError(context, context.l10n.couldNotCaptureImage);
       }
     }
   }
@@ -123,7 +123,7 @@ class _ScanExpiryScreenState extends ConsumerState<ScanExpiryScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Scan expiry date')),
+      appBar: AppBar(title: Text(context.l10n.scanExpiryDate)),
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.all(AppSpacing.lg),
@@ -143,6 +143,8 @@ class _ScanExpiryScreenState extends ConsumerState<ScanExpiryScreen> {
                           child: Text(
                             '${_draft.productName}'
                             '${_draft.brand != null ? ' · ${_draft.brand}' : ''}',
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
                             style: const TextStyle(
                                 fontWeight: FontWeight.w600),
                           ),
@@ -155,11 +157,11 @@ class _ScanExpiryScreenState extends ConsumerState<ScanExpiryScreen> {
                 OutlinedButton.icon(
                   onPressed: _searchByName,
                   icon: const Icon(Icons.search),
-                  label: const Text('Search product by name'),
+                  label: Text(context.l10n.searchProductByName),
                 ),
               const SizedBox(height: AppSpacing.md),
               Text(
-                'Point your camera at the printed expiry, "best before", or MFG date.',
+                context.l10n.scanExpiryInstruction,
                 style: TextStyle(color: Theme.of(context).colorScheme.onSurfaceVariant),
               ),
               const SizedBox(height: AppSpacing.md),
@@ -167,8 +169,8 @@ class _ScanExpiryScreenState extends ConsumerState<ScanExpiryScreen> {
                 onPressed: _busy ? null : _capture,
                 icon: const Icon(Icons.camera_alt_outlined),
                 label: Text(_rawText == null
-                    ? 'Capture date label'
-                    : 'Re-scan'),
+                    ? context.l10n.captureDateLabel
+                    : context.l10n.reScan),
               ),
               const SizedBox(height: AppSpacing.md),
               if (_busy)
@@ -179,7 +181,7 @@ class _ScanExpiryScreenState extends ConsumerState<ScanExpiryScreen> {
               OutlinedButton.icon(
                 onPressed: _pickManualDate,
                 icon: const Icon(Icons.edit_calendar_outlined),
-                label: const Text('Pick date manually'),
+                label: Text(context.l10n.pickDateManually),
               ),
             ],
           ),
@@ -192,15 +194,15 @@ class _ScanExpiryScreenState extends ConsumerState<ScanExpiryScreen> {
     if (_candidates.isEmpty) {
       return Center(
         child: Text(
-          'Detected dates will appear here.',
+          context.l10n.detectedDatesPlaceholder,
           style: TextStyle(color: Theme.of(context).colorScheme.onSurfaceVariant),
         ),
       );
     }
     return ListView(
       children: [
-        const Text('Detected dates',
-            style: TextStyle(fontWeight: FontWeight.w700)),
+        Text(context.l10n.detectedDates,
+            style: const TextStyle(fontWeight: FontWeight.w700)),
         const SizedBox(height: AppSpacing.sm),
         ..._candidates.map((c) => Card(
               child: ListTile(
@@ -283,8 +285,8 @@ class _ProductSearchDialogState extends State<_ProductSearchDialog> {
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            const Text('Search product',
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700)),
+            Text(context.l10n.searchProduct,
+                style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w700)),
             const SizedBox(height: AppSpacing.md),
             Row(
               children: [
@@ -292,8 +294,8 @@ class _ProductSearchDialogState extends State<_ProductSearchDialog> {
                   child: TextField(
                     controller: widget.controller,
                     autofocus: true,
-                    decoration: const InputDecoration(
-                      hintText: 'e.g. Maggi ketchup',
+                    decoration: InputDecoration(
+                      hintText: context.l10n.searchHintExample,
                       isDense: true,
                     ),
                     onSubmitted: (_) => _search(),
@@ -357,14 +359,14 @@ class _ProductSearchDialogState extends State<_ProductSearchDialog> {
               )
             else
               Text(
-                'Type a product name and search.',
+                context.l10n.typeProductNameHint,
                 style: TextStyle(
                     color: Theme.of(context).colorScheme.onSurfaceVariant),
               ),
             const SizedBox(height: AppSpacing.sm),
             TextButton(
               onPressed: () => Navigator.pop(context),
-              child: const Text('Cancel'),
+              child: Text(context.l10n.cancel),
             ),
           ],
         ),

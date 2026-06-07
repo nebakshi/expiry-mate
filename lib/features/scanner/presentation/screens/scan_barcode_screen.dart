@@ -6,6 +6,7 @@ import 'package:google_mlkit_barcode_scanning/google_mlkit_barcode_scanning.dart
 
 import '../../../../core/constants/app_constants.dart';
 import '../../../../core/errors/failures.dart';
+import '../../../../core/l10n/l10n.dart';
 import '../../../../shared/models/product_draft.dart';
 import '../../../../shared/widgets/common_widgets.dart';
 import '../../../product/domain/entities/product_enums.dart';
@@ -57,7 +58,7 @@ class _ScanBarcodeScreenState extends ConsumerState<ScanBarcodeScreen> {
       if (mounted) {
         setState(() {
           _initializing = false;
-          _error = 'Camera unavailable. Check permissions or enter manually.';
+          _error = context.l10n.cameraUnavailable;
         });
       }
     }
@@ -139,13 +140,13 @@ class _ScanBarcodeScreenState extends ConsumerState<ScanBarcodeScreen> {
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         foregroundColor: Colors.white,
-        title: const Text('Scan barcode',
-            style: TextStyle(color: Colors.white)),
+        title: Text(context.l10n.scanBarcode,
+            style: const TextStyle(color: Colors.white)),
         actions: [
           TextButton(
             onPressed: _enterManually,
-            child: const Text('Enter manually',
-                style: TextStyle(color: Colors.white)),
+            child: Text(context.l10n.enterManually,
+                style: const TextStyle(color: Colors.white)),
           ),
         ],
       ),
@@ -161,7 +162,7 @@ class _ScanBarcodeScreenState extends ConsumerState<ScanBarcodeScreen> {
     }
     if (_error != null || _camera == null) {
       return ErrorView(
-        message: _error ?? 'Camera unavailable.',
+        message: _error ?? context.l10n.cameraUnavailable,
         onRetry: _enterManually,
       );
     }
@@ -173,14 +174,14 @@ class _ScanBarcodeScreenState extends ConsumerState<ScanBarcodeScreen> {
         if (_busy)
           Container(
             color: Colors.black54,
-            child: const Center(
+            child: Center(
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  CircularProgressIndicator(color: Colors.white),
-                  SizedBox(height: 16),
-                  Text('Looking up product…',
-                      style: TextStyle(color: Colors.white)),
+                  const CircularProgressIndicator(color: Colors.white),
+                  const SizedBox(height: 16),
+                  Text(context.l10n.lookingUpProduct,
+                      style: const TextStyle(color: Colors.white)),
                 ],
               ),
             ),
@@ -197,9 +198,9 @@ class _ScanBarcodeScreenState extends ConsumerState<ScanBarcodeScreen> {
                 color: Colors.black54,
                 borderRadius: BorderRadius.circular(20),
               ),
-              child: const Text(
-                'Point at a product barcode',
-                style: TextStyle(color: Colors.white),
+              child: Text(
+                context.l10n.pointAtBarcode,
+                style: const TextStyle(color: Colors.white),
               ),
             ),
           ),

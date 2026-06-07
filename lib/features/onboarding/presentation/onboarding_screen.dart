@@ -3,25 +3,15 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../core/constants/app_constants.dart';
+import '../../../core/l10n/l10n.dart';
 import '../../../core/router/app_router.dart';
 import '../../../core/theme/responsive.dart';
 
-class _Page {
-  const _Page(this.icon, this.title, this.body);
-  final IconData icon;
-  final String title;
-  final String body;
-}
-
-const _pages = [
-  _Page(Icons.qr_code_scanner_rounded, 'Scan in seconds',
-      'Point your camera at a barcode and we identify the product instantly.'),
-  _Page(Icons.document_scanner_outlined, 'Read the expiry date',
-      'Scan the printed date — our India-first parser handles MFG + best-before too.'),
-  _Page(Icons.notifications_active_outlined, 'Never miss an expiry',
-      'Get reminders 7 days, 2 days, and on the day an item expires.'),
-  _Page(Icons.eco_rounded, 'Waste less food',
-      'Track your whole kitchen in one place and use things before they spoil.'),
+const _pageIcons = [
+  Icons.qr_code_scanner_rounded,
+  Icons.document_scanner_outlined,
+  Icons.notifications_active_outlined,
+  Icons.eco_rounded,
 ];
 
 class OnboardingScreen extends ConsumerStatefulWidget {
@@ -48,7 +38,11 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final isLast = _index == _pages.length - 1;
+    final l = context.l10n;
+    final titles = [l.onboardingTitle1, l.onboardingTitle2, l.onboardingTitle3, l.onboardingTitle4];
+    final bodies = [l.onboardingBody1, l.onboardingBody2, l.onboardingBody3, l.onboardingBody4];
+    final isLast = _index == _pageIcons.length - 1;
+
     return Scaffold(
       body: SafeArea(
         child: Column(
@@ -57,16 +51,15 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
               alignment: Alignment.centerRight,
               child: TextButton(
                 onPressed: _finish,
-                child: const Text('Skip'),
+                child: Text(l.skip),
               ),
             ),
             Expanded(
               child: PageView.builder(
                 controller: _controller,
-                itemCount: _pages.length,
+                itemCount: _pageIcons.length,
                 onPageChanged: (i) => setState(() => _index = i),
                 itemBuilder: (_, i) {
-                  final p = _pages[i];
                   final iconSize = Responsive.isSmallDevice ? 48.0 : 72.0;
                   final iconPad = Responsive.isSmallDevice ? 18.0 : 28.0;
                   return Padding(
@@ -80,17 +73,17 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                             color: AppColors.primary.withValues(alpha: 0.10),
                             shape: BoxShape.circle,
                           ),
-                          child: Icon(p.icon,
+                          child: Icon(_pageIcons[i],
                               size: iconSize, color: AppColors.primary),
                         ),
                         SizedBox(height: Responsive.isSmallDevice ? AppSpacing.md : AppSpacing.xl),
-                        Text(p.title,
+                        Text(titles[i],
                             textAlign: TextAlign.center,
                             style: TextStyle(
                                 fontSize: Responsive.fontSize(22),
                                 fontWeight: FontWeight.w800)),
                         const SizedBox(height: AppSpacing.md),
-                        Text(p.body,
+                        Text(bodies[i],
                             textAlign: TextAlign.center,
                             style: TextStyle(
                                 fontSize: Responsive.fontSize(15),
@@ -104,7 +97,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
             ),
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
-              children: List.generate(_pages.length, (i) {
+              children: List.generate(_pageIcons.length, (i) {
                 final active = i == _index;
                 return AnimatedContainer(
                   duration: const Duration(milliseconds: 250),
@@ -133,7 +126,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                     );
                   }
                 },
-                child: Text(isLast ? 'Get started' : 'Next'),
+                child: Text(isLast ? l.getStarted : l.next),
               ),
             ),
           ],

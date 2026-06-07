@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../core/constants/app_constants.dart';
+import '../../core/l10n/l10n.dart';
 import '../../core/theme/responsive.dart';
 import '../../features/product/domain/entities/product_enums.dart';
 
@@ -26,12 +27,16 @@ class StatusBadge extends StatelessWidget {
                 BoxDecoration(color: status.color, shape: BoxShape.circle),
           ),
           const SizedBox(width: 6),
-          Text(
-            status.label,
-            style: TextStyle(
-              color: status.color,
-              fontSize: 12,
-              fontWeight: FontWeight.w600,
+          Flexible(
+            child: Text(
+              status.label,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: TextStyle(
+                color: status.color,
+                fontSize: 12,
+                fontWeight: FontWeight.w600,
+              ),
             ),
           ),
         ],
@@ -119,7 +124,7 @@ class ErrorView extends StatelessWidget {
               OutlinedButton.icon(
                 onPressed: onRetry,
                 icon: const Icon(Icons.refresh),
-                label: const Text('Retry'),
+                label: Text(context.l10n.retry),
               ),
             ],
           ],
